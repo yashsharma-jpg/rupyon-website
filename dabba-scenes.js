@@ -56,8 +56,8 @@
   /* her hand: copies of the round 3 hands with the white screen cut out, so the app UI sits behind the thumb.
      x, y, w, h is the screen hole in the 1024 x 1536 file; tip is the thumb tip */
   const HANDS = {
-    hold: { n: "hand-phone-hold-woman-screen", x: 251, y: 155, w: 420, h: 817 },
-    thumb: { n: "hand-phone-thumb-woman-screen", x: 135, y: 107, w: 581, h: 1029, tip: [536, 1024] },
+    hold: { n: "hand-phone-hold-woman-v2-screen", x: 251, y: 155, w: 420, h: 819 },
+    thumb: { n: "hand-phone-thumb-woman-v2-screen", x: 251, y: 155, w: 420, h: 819, tip: [502, 863] },
   };
   function handPhone(kind, sx, sy, sw, screen, bg = CREAM) {
     const H = HANDS[kind], s = sw / H.w, sh = H.h * s, id = "scr" + (++CID);
@@ -150,11 +150,11 @@
 
   /* ---------- the one phone ----------
      Every beat that shows the app draws THIS device. Its screen is one app: pages push in and out (never two screens faded over each other), the status
-     bar stays put, and the hand PNGs are stretched so their screen hole is exactly this screen (sx 70, sy 146, 200 x 390), so the hand "takes" the same phone.
+     bar stays put, and both v2 hand PNGs hold this same phone: their 420 x 819 screen hole scales evenly onto this screen (sx 70, sy 146, 200 x 390), so the hand "takes" it.
      Page images are the real app screens; sip-setup-fit.jpg is sip-setup.jpg with blank rows taken out so it matches the screen's shape. */
   const PG = { sip: ["sip-setup-fit", "#FFFFFF", "top", 1521 / 780], sips: ["sips", "#F8FEFA", "top", 1516 / 780], red: ["redeem", "#FFFFFF", "bot", 1382 / 780], done: ["redeem-done", "#FFFFFF", "bot", 1382 / 780],
     welcome: ["welcome", "#FCF6E8", "top", 1740 / 780], lang: ["language", "#FCF6E8", "top", 1740 / 780] };
-  const PRESS = { sip: [0.916, 0.064], red: [0.921, 0.059] }, TAPAT = { sip: [0.5, 0.95], red: [0.69, 0.925] };
+  const PRESS = { sip: [0.916, 0.064], red: [0.921, 0.059] }, TAPAT = { sip: [0.5, 0.95], red: [0.62, 0.91] }; // red: under the v2 thumb, whose tip is at 60% across, 86% down
   const P = (p, a, b) => C((p - a) / (b - a)), EI = t => t * t * t;
   function device(o) {
     const { sx = 70, sy = 146, w = 200, h = 390, off = 0, reveal = 1, pages = [], press = null, tap = null, hand = null, shadow = false } = o;
@@ -222,7 +222,7 @@
   ];
 
   const FILES = ["dabba-kitchen-wall", "dabba-shelf", "dabba-tin-body", "dabba-tin-lid-steel", "dabba-tin-lid-orange", "dabba-note-rolled", "dabba-note-flat", "dabba-jar-left", "dabba-jar-right",
-    "hand-phone-hold-woman-screen", "hand-phone-thumb-woman-screen", "dabba-daughter-slip"];
+    "hand-phone-hold-woman-v2-screen", "hand-phone-thumb-woman-v2-screen", "dabba-daughter-slip"];
   /* decode the illustrations once, so scrubbing doesn't flash */
   function preload() { FILES.forEach(n => { new Image().src = IMG + n + ".png"; }); ["sip-setup-fit", "sips", "redeem", "redeem-done", "welcome", "language"].forEach(n => { new Image().src = SHOTS + n + ".jpg"; }); const t = new Image(); t.src = TURN; }
 
