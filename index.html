@@ -77,8 +77,10 @@ const send = (f, msg) => { if (ready.has(f)) f.contentWindow.postMessage({ rupyo
 addEventListener("message", e => {
   if (!e.data || !e.data.rupyonReady) return;
   const f = [pf, df].find(x => x.contentWindow === e.source); if (!f) return;
-  ready.add(f); send(f, { lang }); if (hash) send(f, { hash });
+  ready.add(f); send(f, { lang, showSwitch: document.body.classList.contains("bare") }); if (hash) send(f, { hash });
 });
+/* a site page asks to swap to the other variation (its own switch, shown on a phone) */
+addEventListener("message", e => { if (e.data && e.data.rupyonSite) setSite(e.data.rupyonSite); });
 function load(f) {
   if (f.dataset.site === SITE) return;
   ready.delete(f); f.dataset.site = SITE; f.parentElement.querySelector(".oops")?.remove();
@@ -90,6 +92,7 @@ function load(f) {
 function layout() {
   const bare = innerWidth < 760;
   document.body.classList.toggle("bare", bare);
+  send(pf, { showSwitch: bare });
   if (bare) { slots.phone.hidden = false; slots.desktop.hidden = true; load(pf); return; }
   const W = stage.clientWidth - 40, H = stage.clientHeight - 56;
   const show = { phone: view !== "desktop", desktop: view !== "phone" };
@@ -112,10 +115,12 @@ document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click"
 document.querySelectorAll("[data-lang]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.lang === lang)));
 /* the two variations: the original scroll story, and the one that moves to Kiwi's beats */
 function markSite() { document.querySelectorAll("button[data-site]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.site === SITE))); }
-document.querySelectorAll("button[data-site]").forEach(b => b.addEventListener("click", () => {
-  SITE = b.dataset.site; try { localStorage.setItem("rupyon-site", SITE); } catch (e) {}
+function setSite(s) {
+  if (!["site.html", "kiwi.html"].includes(s)) return;
+  SITE = s; try { localStorage.setItem("rupyon-site", SITE); } catch (e) {}
   markSite(); [pf, df].forEach(f => { if (f.dataset.site) load(f); });
-}));
+}
+document.querySelectorAll("button[data-site]").forEach(b => b.addEventListener("click", () => setSite(b.dataset.site)));
 markSite();
 const jumpSel = document.getElementById("jump");
 if (location.hash && jumpSel.querySelector(`option[value="${location.hash}"]`)) jumpSel.value = location.hash;
