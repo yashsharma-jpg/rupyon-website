@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rupyon · Maa hai na</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600&family=Noto+Sans+Bengali:wght@600&family=Noto+Sans+Gujarati:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&family=Noto+Sans+Kannada:wght@600&display=swap">
+<style>
+/* Scroll prototype of the Rupyon site, round 3 (Maa hai na). Mobile first: the opener is a full-screen sticky stage under 900px,
+   and on desktop it becomes words on the left with the scene in a 9:16 window on the right. Colours are Neev's light tokens. */
+:root {
+  --canvas: #FDF5E9; --card: #FFFFFF; --ink: #1A1310; --ink-2: #5B4A3F; --ink-3: #8A7666;
+  --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412;
+  --f-head: "Anek Latin", "Inter", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-deva: "Noto Sans Devanagari", "Noto Sans", "Inter", system-ui, sans-serif;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--canvas); color: var(--ink); font: 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+[lang="hi"] { font-family: var(--f-deva); }
+h1, h2, h3 { font-family: var(--f-head); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+img { max-width: 100%; }
+a, button { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 3px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 24px; border-radius: 999px; border: 0; background: var(--brand-500); color: #fff; font: 600 16px var(--f-body); text-decoration: none; cursor: pointer; transition: background .15s, transform .1s; }
+.btn:hover { background: var(--brand-600); }
+.btn:active { transform: scale(.98); }
+.btn.sm { height: 36px; padding: 0 16px; font-size: 14px; }
+.risk { font-size: 11px; line-height: 1.5; color: var(--ink-3); }
+
+/* nav */
+.nav { position: fixed; z-index: 20; inset: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--gutter) 12px; pointer-events: none; }
+.nav > * { pointer-events: auto; }
+.logo { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 600 22px var(--f-head); letter-spacing: -0.02em; }
+.logo img { width: 30px; height: 30px; }
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.lang-toggle { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .85); border: 1px solid var(--brand-100); box-shadow: 0 1px 2px rgba(26, 19, 16, .06); }
+.lang-toggle button { height: 30px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 13px var(--f-body); cursor: pointer; transition: background .15s, color .15s; }
+.lang-toggle button[lang="hi"] { font-family: var(--f-deva); }
+.lang-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+:root[lang="hi"] body, :root[lang="hi"] .btn { font-family: var(--f-deva); }
+:root[lang="hi"] h2 { font-family: var(--f-deva); letter-spacing: 0; line-height: 1.4; }
+@media (max-width: 479px) { .nav-cta { display: none; } }
+
+/* opener */
+.opener { position: relative; height: 760svh; }
+.stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.scene { position: absolute; inset: 0; background: var(--canvas); }
+.scene svg { width: 100%; height: 100%; display: block; }
+.side { display: contents; }
+.copy { position: absolute; left: var(--gutter); right: var(--gutter); text-align: center; pointer-events: none; opacity: 0; transform: translateY(10px); transition: opacity .3s ease, transform .3s ease; }
+.copy.show { opacity: 1; transform: none; }
+.copy.top { top: calc(10svh + 8px); }
+.copy.bottom { bottom: 9svh; }
+.copy .line { font: 600 28px/1.25 var(--f-head); letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
+:root[lang="hi"] .copy .line { font: 600 26px/1.4 var(--f-deva); letter-spacing: 0; }
+.cta { position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(4svh + 28px); display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; opacity: 0; transform: translateY(10px); transition: opacity .3s ease, transform .3s ease; pointer-events: none; }
+.cta.show { opacity: 1; transform: none; pointer-events: auto; }
+.cta .risk { max-width: 34ch; }
+.rail { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(249, 115, 22, .15); }
+.rail span { display: block; height: 100%; width: 0; background: var(--brand-500); }
+.hint { display: none; position: absolute; font-size: 12px; font-weight: 500; color: var(--ink-3); letter-spacing: .04em; transition: opacity .3s; flex-direction: column; gap: 2px; }
+.hint svg { animation: nudge 1.6s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: translateY(4px); } }
+.dots { display: none; }
+
+/* sections */
+.sec { padding-block: 72px; padding-left: var(--gutter); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.sec-in { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.sec-head { display: flex; flex-direction: column; gap: 8px; max-width: 40rem; }
+.label { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-700); }
+.sec-head h2 { font-size: 30px; line-height: 1.3; }
+.sec-head .sub { font-size: 17px; color: var(--ink-2); }
+.white { background: var(--card); }
+
+.moments { display: grid; grid-auto-flow: column; grid-auto-columns: 82%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; }
+.moments::-webkit-scrollbar { display: none; }
+.moment { scroll-snap-align: center; background: var(--card); border: 1px solid var(--brand-100); border-radius: 16px; box-shadow: 0 1px 2px rgba(26, 19, 16, .05); padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.art { aspect-ratio: 4 / 3; border-radius: 12px; background: var(--brand-50); display: grid; place-items: center; overflow: hidden; }
+.art img { width: 78%; height: 88%; object-fit: contain; }
+.mtop { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.who { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; background: var(--brand-100); color: var(--brand-800); }
+.who.bahu { background: var(--brand-200); color: var(--ink); }
+.who.self { background: var(--ink); color: var(--canvas); }
+:root[lang="hi"] .who { letter-spacing: 0; text-transform: none; font-size: 12px; }
+.amt { font: 600 24px var(--f-head); font-variant-numeric: tabular-nums; color: var(--brand-800); }
+.moment .mline { font: 600 19px/1.35 var(--f-head); }
+:root[lang="hi"] .moment .mline { font-family: var(--f-deva); line-height: 1.45; }
+.moment .saved { font-size: 13px; color: var(--ink-3); border-top: 1px dashed var(--brand-200); padding-top: 8px; margin-top: auto; }
+
+.calc { display: grid; gap: 16px; background: var(--canvas); border: 1px solid var(--brand-100); border-radius: 20px; padding: 20px; }
+.calc-in { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.field { display: flex; flex-direction: column; gap: 10px; }
+.flabel { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+.flabel b { font: 600 20px var(--f-head); color: var(--ink); font-variant-numeric: tabular-nums; }
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--card); border: 1px solid var(--brand-100); border-radius: 999px; }
+.seg button { height: 40px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 15px var(--f-body); cursor: pointer; transition: background .15s, color .15s; }
+.seg button[aria-pressed="true"] { background: var(--brand-500); color: #fff; }
+.calc input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--brand-500); }
+.calc-out { background: var(--card); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.olabel { font-size: 14px; color: var(--ink-2); }
+.total { font: 600 44px/1.15 var(--f-head); color: var(--brand-800); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.osub { font-size: 15px; color: var(--ink-2); }
+.fine { font-size: 12px; color: var(--ink-3); margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--brand-200); }
+:root[lang="hi"] .seg button { font-family: var(--f-deva); }
+.note-line { font-size: 15px; color: var(--ink-2); }
+
+.trust { display: grid; gap: 12px; }
+.tcard { background: var(--card); border: 1px solid var(--brand-100); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+.tcard b { font: 600 18px var(--f-head); }
+.tcard p { font-size: 15px; color: var(--ink-2); }
+
+.langs { display: flex; flex-wrap: wrap; gap: 10px; }
+.lang { background: var(--card); border: 1px solid var(--brand-100); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 17px; }
+.lang:lang(bn) { font-family: "Noto Sans Bengali", sans-serif; }
+.lang:lang(gu) { font-family: "Noto Sans Gujarati", sans-serif; }
+.lang:lang(ta) { font-family: "Noto Sans Tamil", sans-serif; }
+.lang:lang(te) { font-family: "Noto Sans Telugu", sans-serif; }
+.lang:lang(kn) { font-family: "Noto Sans Kannada", sans-serif; }
+.lang:lang(mr), .lang:lang(hi) { font-family: var(--f-deva); }
+
+.start { background: var(--brand-500); color: #fff; }
+.start .sec-in { align-items: center; text-align: center; }
+.start h2 { font-size: 34px; line-height: 1.3; }
+.start .sub { color: #FFEDD5; font-size: 17px; }
+.start .btn { background: #fff; color: var(--brand-800); }
+.start .btn:hover { background: var(--brand-50); }
+.start .risk { color: #FFEDD5; max-width: 46ch; }
+footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64px); display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; color: var(--ink-3); font-size: 13px; }
+
+@media (min-width: 900px) {
+  :root { --gutter: max(48px, calc((100vw - 1200px) / 2)); }
+  .nav { padding-top: 20px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 72px; padding: 96px var(--gutter) 40px; }
+  .scene { position: relative; inset: auto; height: min(calc(100svh - 136px), 820px); aspect-ratio: 9 / 16; border-radius: 32px; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(26, 19, 16, .35), 0 0 0 1px var(--brand-100); grid-column: 2; grid-row: 1; }
+  .side { display: flex; flex-direction: column; gap: 32px; grid-column: 1; grid-row: 1; min-height: 280px; justify-content: center; }
+  .copy, .copy.top, .copy.bottom, .cta { position: static; text-align: left; }
+  .copy .line, :root[lang="hi"] .copy .line { font-size: clamp(40px, 4.2vw, 60px); line-height: 1.2; }
+  :root[lang="hi"] .copy .line { line-height: 1.35; }
+  .cta { align-items: flex-start; text-align: left; }
+  .hint { display: flex; left: var(--gutter); align-items: flex-start; bottom: 48px; }
+  .dots { display: flex; gap: 8px; position: absolute; left: var(--gutter); top: 50%; margin-top: 180px; }
+  .dots i { width: 8px; height: 8px; border-radius: 4px; background: var(--brand-200); transition: width .3s, background .3s; }
+  .dots i.on { width: 28px; background: var(--brand-500); }
+  .rail { display: none; }
+  .sec { padding-block: 112px; padding-left: var(--gutter); padding-right: var(--gutter); }
+  .sec-head h2 { font-size: 40px; }
+  .moments { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .trust { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .calc { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; padding: 28px; }
+  .calc-out { justify-content: center; padding: 28px; }
+  .total { font-size: 56px; }
+  .start h2 { font-size: 48px; }
+  .start-row { display: flex; align-items: center; gap: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .copy, .cta { transition: none; }
+  .hint svg { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Rupyon">
+  <a class="logo" href="#top"><img src="brand/turn-mark.svg" alt="">Rupyon</a>
+  <div class="nav-right">
+    <div class="lang-toggle" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिंदी</button></div>
+    <a class="btn sm nav-cta" href="#start" data-t="cta">Start With ₹100</a>
+  </div>
+</nav>
+
+<main id="top">
+  <section class="opener" id="opener" aria-label="Maa hai na">
+    <div class="stage">
+      <div class="scene"><svg id="scene" viewBox="0 0 360 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Rupyon story"></svg></div>
+      <div class="side">
+        <div class="copy" id="copy"><p class="line" id="line"></p></div>
+        <div class="cta" id="cta"><a class="btn" href="#start" data-t="cta">Start With ₹100</a><p class="risk" data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</p></div>
+      </div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="hint" id="hint" aria-hidden="true">Scroll<svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="rail" aria-hidden="true"><span id="rail"></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="moments" aria-labelledby="moments-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label" data-t="mLabel">Maa hai na</span><h2 id="moments-h" data-t="mTitle">Money ready when it’s needed.</h2><p class="sub" data-t="mSub">Money she put aside days and months ago, there when the family needs it.</p></div>
+      <div class="moments" id="moment-list"></div>
+    </div>
+  </section>
+
+  <section class="sec white" id="rhythm" aria-labelledby="rhythm-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label" data-t="rLabel">Your rhythm</span><h2 id="rhythm-h" data-t="rTitle">Save the way you earn.</h2><p class="sub" data-t="rSub">Daily, weekly or monthly, from ₹100. See what it adds up to.</p></div>
+      <div class="calc" id="calc">
+        <div class="calc-in">
+          <div class="field"><span class="flabel" id="c-how" data-t="cHow">How often</span>
+            <div class="seg" role="group" aria-labelledby="c-how">
+              <button type="button" data-f="daily" aria-pressed="true" data-t="daily">Daily</button><button type="button" data-f="weekly" aria-pressed="false" data-t="weekly">Weekly</button><button type="button" data-f="monthly" aria-pressed="false" data-t="monthly">Monthly</button>
+            </div></div>
+          <div class="field"><label class="flabel" for="c-amt"><span data-t="cAmt">Amount each time</span><b id="c-amt-v">₹100</b></label><input type="range" id="c-amt" min="100" max="1000" step="50" value="100"></div>
+          <div class="field"><label class="flabel" for="c-dur"><span data-t="cDur">For how long</span><b id="c-dur-v">1 year</b></label><input type="range" id="c-dur" min="1" max="60" step="1" value="12"></div>
+        </div>
+        <div class="calc-out" aria-live="polite">
+          <span class="olabel" data-t="cOut">You’ll have put aside</span>
+          <b class="total" id="c-total">₹36,500</b>
+          <span class="osub" id="c-sub">365 payments of ₹100</span>
+          <p class="fine" data-t="cFine">This counts only what you put in. The value of mutual funds can go up or down.</p>
+        </div>
+      </div>
+      <p class="note-line" data-t="rNote">Set it once with your UPI PIN. UPI AutoPay does the rest.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="yours" aria-labelledby="yours-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label" data-t="yLabel">Your money stays yours</span><h2 id="yours-h" data-t="yTitle">Your money, in your name.</h2><p class="sub" data-t="ySub">Every rupee is held in your name and comes back to your own bank.</p></div>
+      <div class="trust">
+        <div class="tcard"><b data-t="t1">In your name</b><p data-t="t1p">Every rupee you save is held in your own name.</p></div>
+        <div class="tcard"><b data-t="t2">Back to your bank</b><p data-t="t2p">When you take money out, it goes to your own bank account.</p></div>
+        <div class="tcard"><b data-t="t3">Help any time</b><p data-t="t3p">Support is open 24/7.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec white" id="language" aria-labelledby="lang-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label" data-t="lLabel">Your language</span><h2 id="lang-h" data-t="lTitle">In your own language.</h2><p class="sub" data-t="lSub">Hard words turn simple, in eight languages.</p></div>
+      <div class="langs">
+        <span class="lang" lang="hi">हिन्दी</span><span class="lang" lang="mr">मराठी</span><span class="lang" lang="bn">বাংলা</span><span class="lang" lang="gu">ગુજરાતી</span>
+        <span class="lang" lang="ta">தமிழ்</span><span class="lang" lang="te">తెలుగు</span><span class="lang" lang="kn">ಕನ್ನಡ</span><span class="lang" lang="en">English</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec start" id="start" aria-labelledby="start-h">
+    <div class="sec-in">
+      <h2 id="start-h" data-t="sTitle">Start with ₹100.</h2>
+      <p class="sub" data-t="sSub">Set it once, and it saves on its own.</p>
+      <div class="start-row"><a class="btn" href="#start" data-t="cta">Start With ₹100</a></div>
+      <p class="risk" data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a class="logo" href="#top"><img src="brand/turn-mark.svg" alt="">Rupyon</a>
+  <p><span data-t="support">Support 24/7</span> · <span data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</span></p>
+</footer>
+
+<script>window.DABBA_ASSETS = "assets/dabba/"; window.TURN_MARK = "brand/turn-mark.svg";</script>
+<script src="dabba-scenes.js"></script>
+<script>
+const { C, CREAM, DEFS, beats, setLang } = DabbaScenes;
+
+/* the seven beats; w is each beat's share of the scroll */
+const BEATS = [
+  { w: 1.3, line: { en: "Save from ₹100, on its own.", hi: "₹100 से बचत, अपने आप।" }, pos: "bottom" },
+  { w: 2 },
+  { w: 2 },
+  { w: 2.2, line: { en: "Mum’s tin. Now on her phone too.", hi: "मम्मी का डब्बा, अब फ़ोन में भी।" }, pos: "top" },
+  { w: 1.7, bg: "#FFFFFF", line: { en: "Fees due on Friday.", hi: "शुक्रवार तक फ़ीस भरनी है।" }, pos: "top" },
+  { w: 2.6, line: { en: "Saved months ago. There when it’s needed.", hi: "महीनों पहले बचाया, ज़रूरत पर काम आया।" }, pos: "top" },
+  { w: 2.2, line: { en: "Maa’s got it.", hi: "माँ है ना।" }, pos: "top", cta: true },
+].map((b, i) => ({ ...b, draw: beats[i] }));
+
+/* ---------- scroll wiring ---------- */
+const svg = document.getElementById("scene"), opener = document.getElementById("opener"), copy = document.getElementById("copy"), lineEl = document.getElementById("line"),
+  ctaEl = document.getElementById("cta"), rail = document.getElementById("rail"), hint = document.getElementById("hint"), dots = document.getElementById("dots");
+const SUM = BEATS.reduce((a, b) => a + b.w, 0), EDGES = BEATS.reduce((acc, b) => (acc.push(acc[acc.length - 1] + b.w / SUM), acc), [0]);
+dots.innerHTML = BEATS.map(() => "<i></i>").join("");
+const desktop = matchMedia("(min-width: 900px)");
+let cur = -1, queued = false;
+function progress() { const r = opener.getBoundingClientRect(); return C(-r.top / (opener.offsetHeight - innerHeight)); }
+function draw() {
+  queued = false;
+  const g = progress(); let i = 0; while (i < BEATS.length - 1 && g >= EDGES[i + 1]) i++;
+  const p = C((g - EDGES[i]) / (EDGES[i + 1] - EDGES[i])), b = BEATS[i];
+  svg.innerHTML = DEFS + `<rect x="-400" y="-400" width="1160" height="1440" fill="${b.bg || "url(#sky)"}"/>` + b.draw(p);
+  svg.parentElement.style.background = b.bg || CREAM;
+  if (i !== cur) {
+    cur = i; copy.classList.remove("show");
+    [...dots.children].forEach((d, k) => d.classList.toggle("on", k === i));
+    if (b.line) { lineEl.textContent = b.line[lang]; copy.className = "copy " + (b.pos || "top"); void copy.offsetWidth; copy.classList.add("show"); }
+  }
+  ctaEl.classList.toggle("show", !!b.cta && p > 0.3);
+  rail.style.width = (g * 100).toFixed(2) + "%";
+  hint.style.opacity = g > 0.015 ? 0 : 1;
+}
+const queue = () => { if (!queued) { queued = true; requestAnimationFrame(draw); } };
+addEventListener("scroll", queue, { passive: true });
+addEventListener("resize", queue);
+desktop.addEventListener("change", queue);
+
+/* #beat-1 to #beat-7 jump to that beat, for review and screenshots */
+function jump() {
+  const m = location.hash.match(/^#beat-([1-7])$/); if (!m) return;
+  const k = +m[1] - 1, at = EDGES[k] + (EDGES[k + 1] - EDGES[k]) * (k === 5 ? 0.6 : 0.75);
+  scrollTo(0, opener.offsetTop + at * (opener.offsetHeight - innerHeight));
+}
+addEventListener("hashchange", () => { jump(); queue(); });
+
+/* ---------- words, in English and Hindi. The Hindi is a draft for native review ---------- */
+const RISK = { en: "Mutual fund investments are subject to market risks. Read all scheme related documents carefully.", hi: "म्यूचुअल फंड निवेश बाज़ार जोखिमों के अधीन हैं। योजना से जुड़े सभी दस्तावेज़ ध्यान से पढ़ें।" };
+const STR = {
+  en: { cta: "Start With ₹100", risk: RISK.en, support: "Support 24/7",
+    mLabel: "Maa hai na", mTitle: "Money ready when it’s needed.", mSub: "Money she put aside days and months ago, there when the family needs it.",
+    rLabel: "Your rhythm", rTitle: "Save the way you earn.", rSub: "Daily, weekly or monthly, from ₹100. See what it adds up to.", daily: "Daily", weekly: "Weekly", monthly: "Monthly", cHow: "How often", cAmt: "Amount each time", cDur: "For how long", cOut: "You’ll have put aside", cFine: "This counts only what you put in. The value of mutual funds can go up or down.", rNote: "Set it once with your UPI PIN. UPI AutoPay does the rest.",
+    yLabel: "Your money stays yours", yTitle: "Your money, in your name.", ySub: "Every rupee is held in your name and comes back to your own bank.",
+    t1: "In your name", t1p: "Every rupee you save is held in your own name.", t2: "Back to your bank", t2p: "When you take money out, it goes to your own bank account.", t3: "Help any time", t3p: "Support is open 24/7.",
+    lLabel: "Your language", lTitle: "In your own language.", lSub: "Hard words turn simple, in eight languages.",
+    sTitle: "Start with ₹100.", sSub: "Set it once, and it saves on its own." },
+  hi: { cta: "₹100 से शुरू करें", risk: RISK.hi, support: "सहायता 24/7",
+    mLabel: "माँ है ना", mTitle: "जब ज़रूरत हो, पैसा तैयार।", mSub: "दिनों और महीनों पहले बचाया पैसा, परिवार की ज़रूरत पर हाज़िर।",
+    rLabel: "आपकी रफ़्तार", rTitle: "जैसी कमाई, वैसी बचत।", rSub: "रोज़, हर हफ़्ते या हर महीने, ₹100 से। देखिए कितना जुड़ता है।", daily: "रोज़", weekly: "हर हफ़्ते", monthly: "हर महीने", cHow: "कितनी बार", cAmt: "हर बार कितना", cDur: "कितने समय तक", cOut: "आपकी कुल जमा", cFine: "यह सिर्फ़ आपकी जमा की गई रकम है। म्यूचुअल फंड की वैल्यू घट-बढ़ सकती है।", rNote: "एक बार UPI PIN से सेट करें। बाकी UPI AutoPay कर देगा।",
+    yLabel: "पैसा आपका ही रहता है", yTitle: "पैसा आपका, आपके नाम।", ySub: "हर रुपया आपके नाम पर, और वापस आपके अपने बैंक में।",
+    t1: "आपके नाम पर", t1p: "आपकी बचत का हर रुपया आपके अपने नाम पर रहता है।", t2: "बैंक में वापस", t2p: "पैसे निकालने पर वे सीधे आपके अपने बैंक खाते में जाते हैं।", t3: "हर समय मदद", t3p: "सहायता 24/7 उपलब्ध है।",
+    lLabel: "आपकी भाषा", lTitle: "अपनी भाषा में।", lSub: "मुश्किल शब्द आसान, आठ भाषाओं में।",
+    sTitle: "₹100 से शुरू करें।", sSub: "एक बार सेट करें, बचत अपने आप होगी।" },
+};
+const MOMENTS = [
+  { who: "maa", amt: "₹1,500", art: "need-school-bag", en: "Fees due? Maa’s got it.", hi: "फ़ीस भरनी है? माँ है ना।", saved: { en: "Saved ₹100 a day since July", hi: "जुलाई से ₹100 रोज़ बचाए" } },
+  { who: "maa", amt: "₹900", art: "need-gas-cylinder", en: "Out of gas? Maa’s got it.", hi: "गैस ख़त्म? माँ है ना।", saved: { en: "Saved ₹200 a week since August", hi: "अगस्त से ₹200 हर हफ़्ते बचाए" } },
+  { who: "bahu", amt: "₹650", art: "need-medicine", en: "Papa ji’s medicines? Bahu’s got it.", hi: "पापा जी की दवाई? बहू है ना।", saved: { en: "Saved ₹500 a month since June", hi: "जून से ₹500 हर महीने बचाए" } },
+  { who: "maa", amt: "₹2,400", art: "need-festive-clothes", en: "New clothes for Diwali? Maa’s got it.", hi: "दिवाली के नए कपड़े? माँ है ना।", saved: { en: "Saved ₹100 a day since Raksha Bandhan", hi: "रक्षाबंधन से ₹100 रोज़ बचाए" } },
+  { who: "maa", amt: "₹4,800", art: "need-bicycle", en: "A cycle for school? Maa’s got it.", hi: "स्कूल की साइकिल? माँ है ना।", saved: { en: "Saved ₹1,000 a month since April", hi: "अप्रैल से ₹1,000 हर महीने बचाए" } },
+  { who: "self", amt: "₹6,500", art: "need-sewing-machine", en: "A sewing machine. For herself too.", hi: "सिलाई मशीन। अपने लिए भी।", saved: { en: "Saved ₹1,000 a month since January", hi: "जनवरी से ₹1,000 हर महीने बचाए" } },
+];
+const WHO = { en: { maa: "Maa", bahu: "Bahu", self: "Herself" }, hi: { maa: "माँ", bahu: "बहू", self: "अपने लिए" } };
+const ART = window.DABBA_ASSETS;
+function renderMoments() {
+  document.getElementById("moment-list").innerHTML = MOMENTS.map(m => `<article class="moment"><div class="art"><img src="${ART}${m.art}.png" alt="" loading="lazy" width="512" height="512"></div>
+    <div class="mtop"><span class="who ${m.who === "maa" ? "" : m.who}">${WHO[lang][m.who]}</span><span class="amt">${m.amt}</span></div>
+    <p class="mline">${m[lang]}</p><p class="saved">${m.saved[lang]}</p></article>`).join("");
+}
+
+/* ---------- language switch: English first, remembered on this device ---------- */
+let lang = "en";
+try { if (localStorage.getItem("rupyon-lang") === "hi") lang = "hi"; } catch (e) {}
+const toggles = document.querySelectorAll(".lang-toggle button");
+function applyLang(l) {
+  lang = l; document.documentElement.lang = l; setLang(l);
+  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = STR[l][el.dataset.t]; });
+  toggles.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
+  renderMoments(); updateCalc(); cur = -1; draw();
+  try { localStorage.setItem("rupyon-lang", l); } catch (e) {}
+}
+toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
+
+/* the presenting harness (preview.html) drives language and jumps from outside the frame */
+addEventListener("message", e => {
+  const m = e.data && e.data.rupyon; if (!m) return;
+  if (m.lang && STR[m.lang]) applyLang(m.lang);
+  if (m.hash) { if (location.hash === m.hash) { jump(); queue(); } else location.hash = m.hash; }
+});
+if (parent !== window) parent.postMessage({ rupyonReady: true }, "*");
+
+/* ---------- savings calculator: only what she puts in, never returns ---------- */
+const RANGE = { daily: [100, 1000, 50], weekly: [100, 5000, 100], monthly: [100, 20000, 100] };
+const amt = document.getElementById("c-amt"), dur = document.getElementById("c-dur"), segs = document.querySelectorAll(".seg button");
+let freq = "daily";
+const inr = n => "₹" + n.toLocaleString("en-IN");
+function durText(m) {
+  const y = Math.floor(m / 12), r = m % 12, out = [];
+  if (lang === "hi") { if (y) out.push(`${y} साल`); if (r) out.push(`${r} ${r === 1 ? "महीना" : "महीने"}`); }
+  else { if (y) out.push(`${y} ${y === 1 ? "year" : "years"}`); if (r) out.push(`${r} ${r === 1 ? "month" : "months"}`); }
+  return out.join(" ");
+}
+function updateCalc() {
+  const [mn, mx, st] = RANGE[freq]; amt.min = mn; amt.max = mx; amt.step = st;
+  const a = +amt.value, m = +dur.value;
+  const n = freq === "daily" ? Math.round(m * 365 / 12) : freq === "weekly" ? Math.round(m * 52 / 12) : m;
+  document.getElementById("c-amt-v").textContent = inr(a);
+  document.getElementById("c-dur-v").textContent = durText(m);
+  document.getElementById("c-total").textContent = inr(n * a);
+  document.getElementById("c-sub").textContent = lang === "hi" ? `${inr(a)} की ${n.toLocaleString("en-IN")} ${n === 1 ? "किस्त" : "किस्तें"}` : `${n.toLocaleString("en-IN")} ${n === 1 ? "payment" : "payments"} of ${inr(a)}`;
+}
+segs.forEach(b => b.addEventListener("click", () => { freq = b.dataset.f; segs.forEach(x => x.setAttribute("aria-pressed", String(x === b))); updateCalc(); }));
+amt.addEventListener("input", updateCalc); dur.addEventListener("input", updateCalc);
+
+DabbaScenes.preload();
+jump(); applyLang(lang);
+</script>
+</body>
+</html>

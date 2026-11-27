@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rupyon · Maa hai na</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@600&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@600&display=swap">
+<style>
+/* Presenting harness for the site: switch between a phone (390 x 844), a desktop (1440 x 900) or both, scaled to fit the window.
+   On a narrow screen it steps aside and shows the site full screen. It talks to the site with postMessage, so it works locally and when published. */
+:root { --bg: #2A1D16; --panel: #3A2B22; --ink: #FBF1E4; --ink-3: #A8917D; --brand: #F97316; --line: #4A382C; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.5 Inter, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; }
+.bar { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); }
+.bar h1 { font: 600 17px "Anek Latin", Inter, sans-serif; margin: 0 6px 0 0; white-space: nowrap; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; }
+.seg button { font: 600 13px Inter, sans-serif; color: var(--ink-3); background: transparent; border: 0; border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.seg button[lang="hi"] { font-family: "Noto Sans Devanagari", Inter, sans-serif; }
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--brand); color: #fff; }
+.jump { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-3); font-weight: 500; }
+.jump select { font: 500 13px Inter, sans-serif; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 32px; padding: 20px; }
+.slot { flex: none; position: relative; }
+.slot[hidden] { display: none; }
+.scale { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.label { position: absolute; top: -18px; left: 0; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.phone { width: 390px; height: 844px; border: 10px solid #000; border-radius: 48px; overflow: hidden; background: #000; box-sizing: content-box; }
+.desk { width: 1440px; height: 928px; border-radius: 12px; overflow: hidden; background: #111; }
+.desk .chrome { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: #1d1d1d; }
+.desk .chrome i { width: 10px; height: 10px; border-radius: 5px; background: #444; }
+iframe { border: 0; display: block; background: #FDF5E9; }
+#pf { width: 390px; height: 844px; }
+#df { width: 1440px; height: 900px; }
+.oops { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--ink-3); }
+.oops a { color: var(--brand); }
+/* on a phone, just the site */
+body.bare .bar, body.bare #desk-slot, body.bare .label { display: none; }
+body.bare .stage { padding: 0; }
+body.bare #phone-slot, body.bare #phone-slot .scale { position: static; width: 100% !important; height: 100% !important; transform: none !important; }
+body.bare .phone { width: 100%; height: 100%; border: 0; border-radius: 0; }
+body.bare #pf { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Rupyon · Maa hai na</h1>
+  <div class="seg" role="group" aria-label="View"><button type="button" data-view="phone" aria-pressed="false">Phone</button><button type="button" data-view="desktop" aria-pressed="false">Desktop</button><button type="button" data-view="both" aria-pressed="false">Both</button></div>
+  <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="hi" lang="hi" aria-pressed="false">हिंदी</button></div>
+  <label class="jump">Jump to
+    <select id="jump">
+      <option value="#beat-1">1 · Hero</option><option value="#beat-2">2 · Days add up</option><option value="#beat-3">3 · Into the phone</option><option value="#beat-4">4 · In her hand</option>
+      <option value="#beat-5">5 · The need</option><option value="#beat-6">6 · Maa hai na</option><option value="#beat-7">7 · Everywhere</option>
+      <option value="#moments">Moments</option><option value="#rhythm">Save the way you earn</option><option value="#yours">Your money</option><option value="#language">Language</option><option value="#start">Start</option>
+    </select>
+  </label>
+</div>
+<div class="stage" id="stage">
+  <div class="slot" id="phone-slot"><span class="label">Phone · 390 × 844</span><div class="scale"><div class="phone"><iframe id="pf" title="Phone view"></iframe></div></div></div>
+  <div class="slot" id="desk-slot"><span class="label">Desktop · 1440 × 900</span><div class="scale"><div class="desk"><div class="chrome"><i></i><i></i><i></i></div><iframe id="df" title="Desktop view"></iframe></div></div></div>
+</div>
+<script>
+const SITE = "site.html";
+const PHONE = [410, 864], DESK = [1440, 928], GAP = 32;
+const pf = document.getElementById("pf"), df = document.getElementById("df"), stage = document.getElementById("stage");
+const slots = { phone: document.getElementById("phone-slot"), desktop: document.getElementById("desk-slot") };
+const ready = new Set();
+let view = "desktop", lang = "en", hash = "";
+try { view = localStorage.getItem("rupyon-view") || (innerWidth < 1100 ? "phone" : "desktop"); lang = localStorage.getItem("rupyon-lang") || "en"; } catch (e) {}
+
+const send = (f, msg) => { if (ready.has(f)) f.contentWindow.postMessage({ rupyon: msg }, "*"); };
+addEventListener("message", e => {
+  if (!e.data || !e.data.rupyonReady) return;
+  const f = [pf, df].find(x => x.contentWindow === e.source); if (!f) return;
+  ready.add(f); send(f, { lang }); if (hash) send(f, { hash });
+});
+function load(f) {
+  if (f.src) return;
+  f.src = SITE + (location.hash || "");
+  /* if the site never says hello, the host blocked the frame: offer the page itself */
+  setTimeout(() => { if (!ready.has(f)) f.parentElement.insertAdjacentHTML("beforeend", `<div class="oops"><p>The preview couldn’t load here.<br><a href="${SITE}" target="_blank" rel="noopener">Open the site on its own</a></p></div>`); }, 8000);
+}
+
+function layout() {
+  const bare = innerWidth < 760;
+  document.body.classList.toggle("bare", bare);
+  if (bare) { slots.phone.hidden = false; slots.desktop.hidden = true; load(pf); return; }
+  const W = stage.clientWidth - 40, H = stage.clientHeight - 56;
+  const show = { phone: view !== "desktop", desktop: view !== "phone" };
+  let s;
+  if (view === "both") s = Math.min(1, (W - GAP) / (PHONE[0] + DESK[0]), H / DESK[1]);
+  else { const d = view === "phone" ? PHONE : DESK; s = Math.min(1, W / d[0], H / d[1]); }
+  [["phone", PHONE], ["desktop", DESK]].forEach(([k, d]) => {
+    const el = slots[k]; el.hidden = !show[k]; if (!show[k]) return;
+    el.style.width = d[0] * s + "px"; el.style.height = d[1] * s + "px";
+    el.querySelector(".scale").style.transform = `scale(${s})`;
+    load(k === "phone" ? pf : df);
+  });
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+}
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => { view = b.dataset.view; try { localStorage.setItem("rupyon-view", view); } catch (e) {} layout(); }));
+document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click", () => {
+  lang = b.dataset.lang; document.querySelectorAll("[data-lang]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  [pf, df].forEach(f => send(f, { lang }));
+}));
+document.querySelectorAll("[data-lang]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.lang === lang)));
+const jumpSel = document.getElementById("jump");
+if (location.hash && jumpSel.querySelector(`option[value="${location.hash}"]`)) jumpSel.value = location.hash;
+jumpSel.addEventListener("change", e => { hash = e.target.value; [pf, df].forEach(f => send(f, { hash })); });
+addEventListener("resize", layout);
+layout();
+</script>
+</body>
+</html>
