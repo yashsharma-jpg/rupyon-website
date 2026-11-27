@@ -9,183 +9,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- The app's fonts only: Anek Latin for headings, Inter for text, Noto Sans for Hindi and the other Indian scripts. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600&family=Noto+Sans+Bengali:wght@600&family=Noto+Sans+Gujarati:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&family=Noto+Sans+Kannada:wght@600&display=swap">
+<link rel="stylesheet" href="sections.css">
 <style>
 /* Moodboard: the tabletop camera story as the hero (from the motion study), then the same sections as the Original page.
    Scrolling moves a camera over paper sheets taped to a gridded table. Under reduced motion the sheets stack and nothing moves. */
-:root {
-  --canvas: #FDF5E9; --card: #FFFFFF; --ink: #1A1310; --ink-2: #5B4A3F; --ink-3: #8A7666;
-  --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-300: #FDBA74; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412; --success-50: #ECFDF3; --success-200: #ABEFC6; --success-600: #079455; --success-700: #067647;
-  --f-head: "Anek Latin", "Inter", system-ui, sans-serif;
-  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-deva: "Noto Sans Devanagari", "Noto Sans", "Inter", system-ui, sans-serif;
-  --gutter: max(16px, env(safe-area-inset-left, 0px));
-  color-scheme: light;
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; }
-body { background: var(--canvas); color: var(--ink); font: 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
-[lang="hi"] { font-family: var(--f-deva); }
-h1, h2, h3 { font-family: var(--f-head); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
-p { margin: 0; }
-img { max-width: 100%; }
-a, button { -webkit-tap-highlight-color: transparent; }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 3px; }
-
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 24px; border-radius: 999px; border: 0; background: var(--brand-500); color: #fff; font: 600 16px var(--f-body); text-decoration: none; cursor: pointer; transition: background .15s, transform .1s; }
-.btn:hover { background: var(--brand-600); }
-.btn:active { transform: scale(.98); }
-.btn.sm { height: 36px; padding: 0 16px; font-size: 14px; }
-.risk { font-size: 11px; line-height: 1.5; color: var(--ink-3); }
-
-.logo { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 600 22px var(--f-head); letter-spacing: -0.02em; }
-.logo .wordmark { display: block; width: auto; height: 26px; }
-.nav-right { display: flex; align-items: center; gap: 8px; }
-.lang-toggle { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .85); border: 1px solid var(--brand-100); box-shadow: 0 1px 2px rgba(26, 19, 16, .06); }
-.lang-toggle button { height: 30px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 13px var(--f-body); cursor: pointer; transition: background .15s, color .15s; }
-.lang-toggle button[lang="hi"] { font-family: var(--f-deva); }
-.lang-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
-:root[lang="hi"] body, :root[lang="hi"] .btn { font-family: var(--f-deva); }
-:root[lang="hi"] h2 { font-family: var(--f-deva); letter-spacing: 0; line-height: 1.4; }
-@media (max-width: 479px) { .nav-cta { display: none; } }
-/* sections */
-.sec { padding-block: 72px; padding-left: var(--gutter); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.sec-in { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
-.sec-head { display: flex; flex-direction: column; gap: 8px; max-width: 40rem; }
-.label { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-700); }
-.sec-head h2 { font-size: 30px; line-height: 1.3; }
-.sec-head .sub { font-size: 17px; color: var(--ink-2); }
-.white { background: linear-gradient(var(--canvas), var(--card) 120px, var(--card) calc(100% - 120px), var(--canvas)); }
-
-.moments { display: grid; grid-auto-flow: column; grid-auto-columns: 84%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; }
-.moments::-webkit-scrollbar { display: none; }
-.art { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; background: radial-gradient(120% 90% at 50% 100%, var(--brand-100), var(--brand-50) 70%); display: grid; place-items: center; overflow: hidden; }
-.art::after { content: ""; position: absolute; left: 24%; right: 24%; bottom: 9%; height: 8%; border-radius: 50%; background: rgba(154, 52, 18, .16); filter: blur(6px); }
-.art img { position: relative; z-index: 1; width: auto; height: 86%; max-width: 70%; object-fit: contain; transition: transform .5s var(--ease-out); }
-.art .who, .art .due { position: absolute; top: 10px; z-index: 2; }
-.art .who { left: 10px; }
-.art .due { right: 10px; }
-.who { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--brand-500); color: #fff; }
-.who.bahu { background: var(--brand-800); }
-.who.self { background: var(--ink); color: var(--canvas); }
-.due { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .92); color: var(--ink-2); }
-:root[lang="hi"] .who { letter-spacing: 0; text-transform: none; font-size: 13px; }
-.mbody { display: flex; flex-direction: column; gap: 6px; padding: 14px 4px 0; }
-.mtitle { font: 600 22px/1.25 var(--f-head); letter-spacing: -.01em; }
-:root[lang="hi"] .mtitle { font-family: var(--f-deva); line-height: 1.4; letter-spacing: 0; }
-.moment .mline { font-size: 15px; line-height: 1.5; color: var(--ink-2); }
-:root[lang="hi"] .moment .mline { line-height: 1.6; }
-.mamt { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
-.amt { font: 600 34px/1 var(--f-head); font-variant-numeric: tabular-nums; color: var(--brand-800); }
-.rdy { font-size: 14px; font-weight: 600; color: var(--success-700); }
-.bar { display: flex; gap: 2px; height: 10px; margin-top: 6px; }
-.bar i { flex: 1; min-width: 0; border-radius: 3px; background: var(--brand-100); transition: background-color .3s ease calc(var(--j) * 24ms); }
-.moment.in .bar i { background: var(--brand-500); }
-.build { font-size: 14px; font-weight: 500; color: var(--ink-3); }
-.bank { display: flex; align-items: center; gap: 8px; margin: 14px 4px 2px; padding-top: 12px; border-top: 1px dashed var(--brand-200); font-size: 14px; font-weight: 500; color: var(--ink-2); margin-top: auto; }
-.mbody { padding-bottom: 14px; }
-.bank svg { flex: none; color: var(--success-700); }
-@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } .art img { transition: none; } }
-.moment { scroll-snap-align: center; background: var(--card); border: 1px solid var(--brand-100); border-radius: 18px; box-shadow: 0 1px 2px rgba(26, 19, 16, .05), 0 18px 30px -26px rgba(154, 52, 18, .4); padding: 10px; display: flex; flex-direction: column; min-width: 0; }
-.mdots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
-.mdots i { width: 8px; height: 8px; border-radius: 4px; background: var(--brand-200); transition: width .3s ease, background-color .3s ease; }
-.mdots i.on { width: 24px; background: var(--brand-500); }
-.moments:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 4px; border-radius: 12px; }
-@media (min-width: 900px) { .mdots { display: none; } .moment { padding: 12px; } }
-
-.calc { display: grid; gap: 16px; background: var(--canvas); border: 1px solid var(--brand-100); border-radius: 20px; padding: 20px; }
-.calc-in { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
-.field { display: flex; flex-direction: column; gap: 10px; }
-.flabel { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
-.flabel b { font: 600 20px var(--f-head); color: var(--ink); font-variant-numeric: tabular-nums; }
-.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--card); border: 1px solid var(--brand-100); border-radius: 999px; }
-.seg button { height: 40px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 15px var(--f-body); cursor: pointer; transition: background .15s, color .15s; }
-.seg button[aria-pressed="true"] { background: var(--brand-500); color: #fff; }
-.calc input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--brand-500); }
-.calc-out { background: var(--card); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.olabel { font-size: 14px; color: var(--ink-2); }
-.total { font: 600 44px/1.15 var(--f-head); color: var(--success-700); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.osub { font-size: 15px; color: var(--ink-2); }
-.fine { font-size: 12px; color: var(--ink-3); margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--brand-200); }
-:root[lang="hi"] .seg button { font-family: var(--f-deva); }
-.note-line { font-size: 15px; color: var(--ink-2); }
-#language { background: linear-gradient(var(--canvas), var(--card) 120px, var(--card) calc(100% - 160px), var(--brand-100)); }
-/* #rhythm is the one green section: Untitled success tints, edges fade to/from the cream canvas */
-#rhythm { background: linear-gradient(var(--canvas), var(--success-50) 160px, var(--success-50) calc(100% - 160px), var(--canvas)); }
-#rhythm .label { color: var(--success-700); }
-#rhythm .calc { background: rgba(255, 255, 255, .55); border-color: var(--success-200); }
-#rhythm .seg { border-color: var(--success-200); }
-#rhythm .seg .thumb, #rhythm .seg button[aria-pressed="true"] { background: var(--success-700); }
-#rhythm .calc input[type=range] { accent-color: var(--success-600); }
-#rhythm .fine { border-top-color: var(--success-200); }
-#rhythm .calc-out .mk { filter: grayscale(1) sepia(1) hue-rotate(75deg) saturate(2.2); }
-
-/* trust: four protection cards from the app's Home screen. A snap carousel under 900px, a 2x2 grid above */
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.prot { display: flex; flex-direction: column; gap: 8px; }
-.prot-track { display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); margin-inline: calc(var(--gutter) * -1); padding: 8px var(--gutter) 4px; scrollbar-width: none; overscroll-behavior-x: contain; }
-.prot-track::-webkit-scrollbar { display: none; }
-.prot-track:focus-visible { outline: 2px solid var(--brand-500); outline-offset: -2px; border-radius: 16px; }
-.pcard { position: relative; flex: 0 0 min(340px, 100%); height: 220px; scroll-snap-align: start; overflow: hidden; border-radius: 16px; border: 1px solid var(--brand-300); background: var(--card); }
-.pcard-t { position: absolute; top: 23px; left: 23px; width: min(260px, calc(100% - 46px)); display: flex; flex-direction: column; gap: 8px; }
-.pcard h3 { font: 600 24px/32px var(--f-head); letter-spacing: -0.01em; text-wrap: wrap; color: var(--ink); }
-.pcard p { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink-2); }
-:root[lang="hi"] .pcard h3 { font-family: var(--f-deva); font-size: 22px; line-height: 30px; letter-spacing: 0; }
-:root[lang="hi"] .pcard p { line-height: 22px; }
-.pcard-i { position: absolute; top: var(--t); right: var(--r); width: var(--w); height: var(--h); pointer-events: none; }
-.pcard-i img { display: block; width: 100%; height: auto; max-width: none; }
-.pcard-i.crop { overflow: hidden; }
-.pcard-i.crop img { position: absolute; top: 0; left: -76.8%; width: 177.03%; }
-.pcard-i.flip { transform: scaleX(-1); }
-.pcard-n { position: absolute; top: -7px; right: -4px; display: flex; align-items: center; justify-content: center; width: 57px; height: 55px; padding-top: 5px; border-radius: 8px; background: linear-gradient(to bottom, var(--brand-600), var(--brand-100)); color: #fff; font: 600 32px/40px var(--f-head); letter-spacing: -0.01em; }
-.prot-dots { display: flex; justify-content: center; gap: 2px; }
-.prot-dots button { display: flex; align-items: center; height: 32px; padding: 0 5px; border: 0; background: none; cursor: pointer; }
-.prot-dots button:focus-visible { outline: 2px solid var(--brand-500); outline-offset: -2px; border-radius: 4px; }
-.pb { display: block; width: 24px; height: 4px; border-radius: 2px; background: var(--brand-300); overflow: hidden; }
-.pb i { display: block; width: 100%; height: 100%; background: var(--brand-600); transform: scaleX(0); transform-origin: 0 50%; }
-.prot-dots .done i, .prot-dots .cur i { transform: none; }
-.prot-dots .run i { animation: pfill 4s linear both; }
-@keyframes pfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.prot.rv .pcard { opacity: 0; transform: translateY(18px); transition: opacity .6s cubic-bezier(.22, 1, .36, 1), transform .6s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--k) * 70ms); }
-.prot.rv.in .pcard { opacity: 1; transform: none; }
-
-.langs { display: flex; flex-wrap: wrap; gap: 10px; }
-.lang { background: var(--card); border: 1px solid var(--brand-100); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 17px; }
-.lang:lang(bn) { font-family: "Noto Sans Bengali", sans-serif; }
-.lang:lang(gu) { font-family: "Noto Sans Gujarati", sans-serif; }
-.lang:lang(ta) { font-family: "Noto Sans Tamil", sans-serif; }
-.lang:lang(te) { font-family: "Noto Sans Telugu", sans-serif; }
-.lang:lang(kn) { font-family: "Noto Sans Kannada", sans-serif; }
-.lang:lang(mr), .lang:lang(hi) { font-family: var(--f-deva); }
-
-.start { background: var(--brand-500); color: #fff; border-radius: 32px 32px 0 0; margin-top: -32px; }
-.start .sec-in { align-items: center; text-align: center; }
-.start h2 { font-size: 34px; line-height: 1.3; }
-.start .sub { color: #FFEDD5; font-size: 17px; }
-.start .btn { background: #fff; color: var(--brand-800); }
-.start .btn:hover { background: var(--brand-50); }
-.start .risk { color: #FFEDD5; max-width: 46ch; }
-footer { padding: 120px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64px); background: linear-gradient(var(--brand-500), var(--canvas) 120px); display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; color: var(--ink-3); font-size: 13px; }
-
-@media (min-width: 900px) {
-  :root { --gutter: max(48px, calc((100vw - 1200px) / 2)); }
-  .sec { padding-block: 112px; padding-left: var(--gutter); padding-right: var(--gutter); }
-  .sec-head h2 { font-size: 40px; }
-  .moments { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; overflow: visible; margin-inline: 0; padding-inline: 0; }
-  .prot-track { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; overflow: visible; scroll-snap-type: none; margin-inline: 0; padding: 8px 0 0; }
-  .pcard { flex: none; }
-  .pcard-t { width: min(340px, calc(100% - 46px)); }
-  .prot-dots { display: none; }
-  .calc { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; padding: 28px; }
-  .calc-out { justify-content: center; padding: 28px; }
-  .total { font-size: 56px; }
-  .start h2 { font-size: 48px; }
-  .start-row { display: flex; align-items: center; gap: 32px; }
-}
 u { text-decoration: none; }
 
 :root { --ground: #e1d5bd; --paper: #fff5e1; --paper-shadow: 0 1px 2px #51361e26, 0 6px 18px -7px #51361e5c;
   --f-serif: var(--f-head); --f-serif-hi: var(--f-deva); } /* the sheets use the app's heading fonts too */
-html { scroll-padding-top: 64px; } /* the fixed masthead's height, so anchor jumps land below it */
+:root { --nav-h: 64px; } /* the fixed masthead's height: sections.css turns it into scroll-padding, and the anchor helper aims below it */
 
 /* masthead and chapter bar (fixed) */
 .masthead, .controls { position: fixed; z-index: 25; inset-inline: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 var(--gutter); background: #f9f2e5; }
@@ -308,7 +140,7 @@ body:not(.moving) .shot2 { display: block; position: absolute; z-index: 3; left:
  .coda-art img { height: 84%; top: 8%; }
 }
 @media (max-width: 660px) {
- html { scroll-padding-top: 52px; }
+ :root { --nav-h: 52px; }
  .masthead { height: 52px; gap: 8px; }
  .masthead-right { gap: 6px; }
  .play { padding: 0 11px; height: 32px; font-size: 13px; }
@@ -321,7 +153,7 @@ body:not(.moving) .shot2 { display: block; position: absolute; z-index: 3; left:
 }
 @media (max-width: 380px) { .masthead .logo img { height: 22px; } .play { padding: 0 9px; font-size: 12px; } }
 @media (max-height: 520px) and (orientation: landscape) {
- html { scroll-padding-top: 40px; }
+ :root { --nav-h: 40px; }
  .masthead, .controls { min-height: 0; height: 40px; }
  .sheet { width: 125svh; height: 74svh; }
  .sheet .copy p { font-size: 1.9cqw; }
@@ -330,11 +162,6 @@ body:not(.moving) .shot2 { display: block; position: absolute; z-index: 3; left:
 body.hero-on .variant { transition: opacity .3s cubic-bezier(0.23, 1, 0.32, 1), transform .3s cubic-bezier(0.23, 1, 0.32, 1), bottom .3s cubic-bezier(0.23, 1, 0.32, 1); }
 body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
 @media (prefers-reduced-motion: reduce) { .controls { transition: none; } }
-
-/* the tabletop eases into the first section */
-#moments { position: relative; background: linear-gradient(var(--ground), var(--canvas) 240px); }
-#moments::before { content: ""; position: absolute; inset: 0 0 auto; height: 240px; pointer-events: none; background-image: linear-gradient(#70523114 1px, transparent 1px), linear-gradient(90deg, #70523114 1px, transparent 1px); background-size: 28px 28px; -webkit-mask-image: linear-gradient(#000, transparent); mask-image: linear-gradient(#000, transparent); }
-#moments .sec-in { position: relative; }
 </style>
 </head>
 <body>
@@ -392,6 +219,7 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
 </article>
 </div></div></div>
 </div>
+  <!-- sections:begin (identical in site.html, kiwi.html and moodboard.html; styled by sections.css, driven by sections.js) -->
   <section class="sec" id="moments" aria-labelledby="moments-h">
     <div class="sec-in">
       <div class="sec-head"><span class="label" data-t="mLabel">Maa hai na</span><h2 id="moments-h" data-t="mTitle">Money ready when it’s needed.</h2><p class="sub" data-t="mSub">Money she put aside days and months ago, there when the family needs it.</p></div>
@@ -400,9 +228,9 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
     </div>
   </section>
 
-  <section class="sec white" id="rhythm" aria-labelledby="rhythm-h">
+  <section class="sec" id="rhythm" aria-labelledby="rhythm-h">
     <div class="sec-in">
-      <div class="sec-head"><span class="label" data-t="rLabel">Your rhythm</span><h2 id="rhythm-h" data-t="rTitle">Save the way you earn.</h2><p class="sub" data-t="rSub">Daily, weekly or monthly, from ₹100. See what it adds up to.</p></div>
+      <div class="sec-head"><span class="label" data-t="rLabel">Your rhythm</span><h2 id="rhythm-h" data-t="rTitle">Save the way you earn.</h2><p class="sub" data-t="rSub">Daily, weekly or monthly, from ₹100. See what it adds up to.</p><p class="sub" data-t="rNote">Set it once with your UPI PIN. UPI AutoPay does the rest.</p></div>
       <div class="calc" id="calc">
         <div class="calc-in">
           <div class="field"><span class="flabel" id="c-how" data-t="cHow">How often</span>
@@ -419,7 +247,6 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
           <p class="fine" data-t="cFine">This counts only what you put in. The value of mutual funds can go up or down.</p>
         </div>
       </div>
-      <p class="note-line" data-t="rNote">Set it once with your UPI PIN. UPI AutoPay does the rest.</p>
     </div>
   </section>
 
@@ -438,7 +265,7 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
     </div>
   </section>
 
-  <section class="sec white" id="language" aria-labelledby="lang-h">
+  <section class="sec" id="language" aria-labelledby="lang-h">
     <div class="sec-in">
       <div class="sec-head"><span class="label" data-t="lLabel">Your language</span><h2 id="lang-h" data-t="lTitle">In your own language.</h2><p class="sub" data-t="lSub">Hard words turn simple, in eight languages.</p></div>
       <div class="langs">
@@ -452,7 +279,7 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
     <div class="sec-in">
       <h2 id="start-h" data-t="sTitle">Start with ₹100.</h2>
       <p class="sub" data-t="sSub">Set it once, and it saves on its own.</p>
-      <div class="start-row"><a class="btn" href="#start" data-t="cta">Start With ₹100</a></div>
+      <div class="start-row"><a class="btn" href="#start"><span data-t="cta">Start With ₹100</span><span class="arr" aria-hidden="true">→</span></a></div>
       <p class="risk" data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</p>
     </div>
   </section>
@@ -462,6 +289,7 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
   <a class="logo" href="#top"><img class="wordmark" src="brand/rupyon-wordmark-orange.png" alt="Rupyon"></a>
   <p><span data-t="support">Support 24/7</span> · <span data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</span></p>
 </footer>
+<!-- sections:end -->
 
 <div class="controls" id="controls"><span class="cue" data-t="cue">Scroll to explore</span><nav aria-label="Story chapters">
   <a href="#kitchen"><span class="full" data-t="n1">Kitchen</span><span class="short" data-t="n1s">Kitchen</span></a>
@@ -473,61 +301,9 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
 
 <script>window.DABBA_ASSETS = "assets/dabba/";</script>
 <script src="variant.js"></script>
+<script src="sections.js"></script>
 <script>
 /* ---------- words, in English and Hindi. The Hindi is a draft for native review ---------- */
-const RISK = { en: "Mutual fund investments are subject to market risks. Read all scheme related documents carefully.", hi: "म्यूचुअल फंड निवेश बाज़ार जोखिमों के अधीन हैं। योजना से जुड़े सभी दस्तावेज़ ध्यान से पढ़ें।" };
-const STR = {
-  en: { cta: "Start With ₹100", risk: RISK.en, support: "Support 24/7",
-    mLabel: "Maa hai na", mTitle: "Money ready when it’s needed.", mSub: "Money she put aside days and months ago, there when the family needs it.",
-    rLabel: "Your rhythm", rTitle: "Save the way you earn.", rSub: "Daily, weekly or monthly, from ₹100. See what it adds up to.", daily: "Daily", weekly: "Weekly", monthly: "Monthly", cHow: "How often", cAmt: "Amount each time", cDur: "For how long", cOut: "You’ll have put aside", cFine: "This counts only what you put in. The value of mutual funds can go up or down.", rNote: "Set it once with your UPI PIN. UPI AutoPay does the rest.",
-    yLabel: "Your money stays yours", yTitle: "How are your funds protected?", pCard: "Card",
-    p1: "SEBI regulated", p1b: "Every fund on Rupyon follows the rules SEBI sets for mutual funds in India.", p2: "We never hold your money", p2b: "A separate SEBI-registered custodian holds it. Not Rupyon, not the fund house.", p3: "The units are in your name", p3b: "Linked to your PAN and recorded with the registrar, not with us.", p4: "Take out your money whenever you want", p4b: "No lock-in. Pause, reduce or stop whenever you want.",
-    lLabel: "Your language", lTitle: "In your own language.", lSub: "Hard words turn simple, in eight languages.",
-    sTitle: "Start with ₹100.", sSub: "Set it once, and it saves on its own." },
-  hi: { cta: "₹100 से शुरू करें", risk: RISK.hi, support: "सहायता 24/7",
-    mLabel: "माँ है ना", mTitle: "जब ज़रूरत हो, पैसा तैयार।", mSub: "दिनों और महीनों पहले बचाया पैसा, परिवार की ज़रूरत पर हाज़िर।",
-    rLabel: "आपकी रफ़्तार", rTitle: "जैसी कमाई, वैसी बचत।", rSub: "रोज़, हर हफ़्ते या हर महीने, ₹100 से। देखिए कितना जुड़ता है।", daily: "रोज़", weekly: "हर हफ़्ते", monthly: "हर महीने", cHow: "कितनी बार", cAmt: "हर बार कितना", cDur: "कितने समय तक", cOut: "आपकी कुल जमा", cFine: "यह सिर्फ़ आपकी जमा की गई रकम है। म्यूचुअल फंड की वैल्यू घट-बढ़ सकती है।", rNote: "एक बार UPI PIN से सेट करें। बाकी UPI AutoPay कर देगा।",
-    yLabel: "पैसा आपका ही रहता है", yTitle: "आपके फंड कैसे सुरक्षित हैं?", pCard: "कार्ड",
-    p1: "SEBI से नियंत्रित", p1b: "यहाँ हर फंड उन नियमों पर चलता है जो SEBI भारत में म्यूचुअल फंड के लिए तय करता है।", p2: "हम आपका पैसा कभी अपने पास नहीं रखते", p2b: "इसे SEBI में पंजीकृत एक अलग कस्टोडियन रखता है। न Rupyon, न फंड हाउस।", p3: "यूनिट आपके नाम पर हैं", p3b: "आपके PAN से जुड़ी हैं और रजिस्ट्रार के पास दर्ज हैं, हमारे पास नहीं।", p4: "जब चाहें अपना पैसा निकालें", p4b: "कोई लॉक-इन नहीं। जब चाहें रोकें, घटाएँ या बंद करें।",
-    lLabel: "आपकी भाषा", lTitle: "अपनी भाषा में।", lSub: "मुश्किल शब्द आसान, आठ भाषाओं में।",
-    sTitle: "₹100 से शुरू करें।", sSub: "एक बार सेट करें, बचत अपने आप होगी।" },
-};
-const MOMENTS = [
-  { who: "maa", art: "need-school-bag", amt: 3000, per: 100, unit: "day", n: 30, title: { en: "School fees", hi: "स्कूल की फ़ीस" }, due: { en: "Due Friday", hi: "शुक्रवार तक" }, line: { en: "No borrowing and no asking anyone.", hi: "न उधार, न किसी से माँगना।" } },
-  { who: "maa", art: "need-gas-cylinder", amt: 900, per: 300, unit: "week", n: 3, title: { en: "Gas cylinder", hi: "गैस सिलेंडर" }, due: { en: "Ran out today", hi: "आज ख़त्म हुआ" }, line: { en: "Empty cylinder, and no worry.", hi: "सिलेंडर ख़त्म, पर कोई फ़िक्र नहीं।" } },
-  { who: "bahu", art: "need-medicine", amt: 1500, per: 500, unit: "month", n: 3, title: { en: "Papa ji’s medicines", hi: "पापा जी की दवाइयाँ" }, due: { en: "This week", hi: "इसी हफ़्ते" }, line: { en: "Bought without asking anyone.", hi: "बिना किसी से कहे ख़रीदीं।" } },
-  { who: "maa", art: "need-festive-clothes", amt: 2400, per: 100, unit: "day", n: 24, title: { en: "Diwali clothes", hi: "दिवाली के कपड़े" }, due: { en: "Before Diwali", hi: "दिवाली से पहले" }, line: { en: "New clothes for the whole house.", hi: "पूरे घर के लिए नए कपड़े।" } },
-  { who: "maa", art: "need-bicycle", amt: 4800, per: 800, unit: "month", n: 6, title: { en: "A cycle for school", hi: "स्कूल की साइकिल" }, due: { en: "New term", hi: "नया सत्र" }, line: { en: "No more long walk to school.", hi: "अब स्कूल तक पैदल नहीं।" } },
-  { who: "self", art: "need-sewing-machine", amt: 6000, per: 1000, unit: "month", n: 6, title: { en: "A sewing machine", hi: "सिलाई मशीन" }, due: { en: "For herself", hi: "अपने लिए" }, line: { en: "Her own work on her own machine.", hi: "अपना काम, अपनी मशीन।" } },
-];
-const WHO = { en: { maa: "Maa", bahu: "Bahu", self: "Herself" }, hi: { maa: "माँ", bahu: "बहू", self: "अपने लिए" } };
-const UNIT = { en: { day: ["a day", "days"], week: ["a week", "weeks"], month: ["a month", "months"] }, hi: { day: ["रोज़", "दिन"], week: ["हर हफ़्ते", "हफ़्ते"], month: ["हर महीने", "महीने"] } };
-const MSTR = { en: { rdy: "ready", bank: "Goes to her own bank account" }, hi: { rdy: "तैयार", bank: "सीधे अपने बैंक खाते में" } };
-const rupee = n => "₹" + n.toLocaleString("en-IN");
-function buildText(m, l) { const u = UNIT[l][m.unit]; return l === "hi" ? `${u[0]} ${rupee(m.per)}, ${m.n} ${u[1]} तक` : `${rupee(m.per)} ${u[0]} for ${m.n} ${u[1]}`; }
-const ART = window.DABBA_ASSETS;
-const BANK_ICON = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 7l7-4 7 4M3.5 7.5v5M7 7.5v5M11 7.5v5M14.5 7.5v5M2 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-function momentCard(m, i, attrs) {
-  const b = buildText(m, lang);
-  return `<article class="moment"${attrs || ""} data-i="${i}"><div class="art"><span class="who ${m.who === "maa" ? "" : m.who}">${WHO[lang][m.who]}</span><span class="due">${m.due[lang]}</span><img src="${ART}${m.art}.png" alt="" loading="lazy" width="512" height="512"></div>
-    <div class="mbody"><h3 class="mtitle">${m.title[lang]}</h3><p class="mline">${m.line[lang]}</p>
-    <div class="mamt"><span class="amt">${rupee(m.amt)}</span><span class="rdy">${MSTR[lang].rdy}</span></div>
-    <div class="bar" role="img" aria-label="${b}">${Array.from({ length: m.n }, (_, j) => `<i style="--j:${j}"></i>`).join("")}</div><p class="build">${b}</p></div>
-    <p class="bank">${BANK_ICON}${MSTR[lang].bank}</p></article>`;
-}
-function renderMoments() {
-  const list = document.getElementById("moment-list"), dots = document.getElementById("mdots");
-  list.innerHTML = MOMENTS.map((m, i) => momentCard(m, i)).join("");
-  dots.innerHTML = MOMENTS.map(() => "<i></i>").join("");
-  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const cards = [...list.children];
-  if (calm) { cards.forEach(c => c.classList.add("in")); }
-  else { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .6 }); cards.forEach(c => io.observe(c)); }
-  const mark = () => { const mid = list.scrollLeft + list.clientWidth / 2; let best = 0, d = 1e9; cards.forEach((c, i) => { const x = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid); if (x < d) { d = x; best = i; } }); [...dots.children].forEach((e, i) => e.classList.toggle("on", i === best)); };
-  list.onscroll = mark; mark();
-}
-
-
 /* The sheet copy. The Hindi is a draft for native review, same as the rest. Copy rules: no dashes, colons, semicolons or exclamation marks.
    Keys ending in h hold the two-line headline (the second line is wrapped in <em>). */
 const MOOD = {
@@ -548,7 +324,7 @@ const MOOD = {
     s5h: "माँ की बचत,<em>बेटी की साइकिल।</em>", s5p: "माँ ने बेटी की स्कूल की साइकिल के लिए हर महीने ₹800 बचाए। अब वह उसी पर स्कूल जाती है।",
     s6h: "₹100 से<em>शुरू करें।</em>" },
 };
-Object.assign(STR.en, MOOD.en); Object.assign(STR.hi, MOOD.hi);
+const STR = MOOD;
 
 /* ---------- language: English first, remembered on this device ---------- */
 let lang = "en";
@@ -558,38 +334,14 @@ const playButton = document.querySelector(".play");
 let playback = null;
 function applyLang(l) {
   lang = l; document.documentElement.lang = l;
-  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = STR[l][el.dataset.t]; });
+  document.querySelectorAll("[data-t]").forEach(el => { const t = STR[l][el.dataset.t]; if (t != null) el.textContent = t; });
+  RupyonSections.setLang(l);
   document.querySelectorAll("[data-h]").forEach(el => { el.innerHTML = STR[l][el.dataset.h]; });
   if (playback !== null) playButton.textContent = STR[l].pause;
   toggles.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
-  renderMoments(); updateCalc();
   try { localStorage.setItem("rupyon-lang", l); } catch (e) {}
 }
 toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
-
-/* ---------- trust cards: a snap carousel under 900px (autoplay every 4s, paused on touch, hover, focus and off-screen), a grid above ---------- */
-(() => {
-  const root = document.getElementById("prot"), track = document.getElementById("prot-track"); if (!root || !track) return;
-  const cards = [...track.children], dots = [...root.querySelectorAll(".prot-dots button")];
-  const wide = matchMedia("(min-width: 900px)"), calm = matchMedia("(prefers-reduced-motion: reduce)");
-  let idx = 0, timer = 0, lock = 0, held = false, shown = false;
-  const running = () => !wide.matches && !calm.matches && !held && shown && !document.hidden;
-  const mark = () => dots.forEach((d, i) => { d.classList.toggle("cur", i === idx); d.classList.toggle("done", i < idx); d.classList.toggle("run", i === idx && running()); if (i === idx) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current"); });
-  const plan = () => { clearTimeout(timer); mark(); if (running()) timer = setTimeout(() => go((idx + 1) % cards.length), 4000); };
-  const go = i => { idx = i; lock = Date.now() + 800; track.scrollTo({ left: cards[i].offsetLeft - cards[0].offsetLeft, behavior: calm.matches ? "auto" : "smooth" }); plan(); };
-  const nearest = () => { let best = 0, d = 1e9; cards.forEach((c, i) => { const x = Math.abs(c.offsetLeft - cards[0].offsetLeft - track.scrollLeft); if (x < d) { d = x; best = i; } }); return best; };
-  track.addEventListener("scroll", () => { if (Date.now() < lock) return; const n = nearest(); if (n !== idx) { idx = n; plan(); } }, { passive: true });
-  dots.forEach((d, i) => d.addEventListener("click", () => go(i)));
-  track.addEventListener("keydown", e => { const k = { ArrowRight: idx + 1, ArrowLeft: idx - 1, Home: 0, End: cards.length - 1 }[e.key]; if (k === undefined || wide.matches) return; e.preventDefault(); go(Math.max(0, Math.min(cards.length - 1, k))); });
-  const hold = v => () => { held = v; plan(); };
-  root.addEventListener("touchstart", hold(true), { passive: true }); root.addEventListener("touchend", hold(false)); root.addEventListener("touchcancel", hold(false));
-  root.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") hold(true)(); }); root.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") hold(false)(); });
-  root.addEventListener("focusin", e => { if (e.target.matches(":focus-visible")) hold(true)(); }); root.addEventListener("focusout", e => { if (!root.contains(e.relatedTarget)) hold(false)(); });
-  new IntersectionObserver(es => { shown = es[es.length - 1].isIntersecting; plan(); }, { threshold: .4 }).observe(root);
-  document.addEventListener("visibilitychange", plan);
-  const fit = () => { track.tabIndex = wide.matches ? -1 : 0; plan(); }; wide.addEventListener("change", fit); calm.addEventListener("change", plan); fit();
-  if (!calm.matches) { root.classList.add("rv"); const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { root.classList.add("in"); io.disconnect(); } }, { threshold: .15 }); io.observe(root); }
-})();
 
 /* ---------- the tabletop camera (from the motion study) ---------- */
 (() => {
@@ -656,7 +408,7 @@ toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)
       return true;
     }
     const el = hash && hash.length > 1 && document.getElementById(hash.slice(1));
-    if (el) { el.scrollIntoView({ block: "start" }); return true; }
+    if (el) return RupyonSections.goTo(hash, { push: false, instant: !smoothly });
     return false;
   };
   function stopPlayback() { if (playback !== null) cancelAnimationFrame(playback); playback = null; playButton.textContent = STR[lang].play; }
@@ -688,28 +440,7 @@ addEventListener("message", e => {
 });
 if (parent !== window) parent.postMessage({ rupyonReady: true }, "*");
 
-/* ---------- savings calculator: only what she puts in, never returns ---------- */
-const RANGE = { daily: [100, 1000, 50], weekly: [100, 5000, 100], monthly: [100, 20000, 100] };
-const amt = document.getElementById("c-amt"), dur = document.getElementById("c-dur"), segs = document.querySelectorAll(".seg button");
-let freq = "daily";
-const inr = n => "₹" + n.toLocaleString("en-IN");
-function durText(m) {
-  const y = Math.floor(m / 12), r = m % 12, out = [];
-  if (lang === "hi") { if (y) out.push(`${y} साल`); if (r) out.push(`${r} ${r === 1 ? "महीना" : "महीने"}`); }
-  else { if (y) out.push(`${y} ${y === 1 ? "year" : "years"}`); if (r) out.push(`${r} ${r === 1 ? "month" : "months"}`); }
-  return out.join(" ");
-}
-function updateCalc() {
-  const [mn, mx, st] = RANGE[freq]; amt.min = mn; amt.max = mx; amt.step = st;
-  const a = +amt.value, m = +dur.value;
-  const n = freq === "daily" ? Math.round(m * 365 / 12) : freq === "weekly" ? Math.round(m * 52 / 12) : m;
-  document.getElementById("c-amt-v").textContent = inr(a);
-  document.getElementById("c-dur-v").textContent = durText(m);
-  document.getElementById("c-total").textContent = inr(n * a);
-  document.getElementById("c-sub").textContent = lang === "hi" ? `${inr(a)} की ${n.toLocaleString("en-IN")} ${n === 1 ? "किस्त" : "किस्तें"}` : `${n.toLocaleString("en-IN")} ${n === 1 ? "payment" : "payments"} of ${inr(a)}`;
-}
-segs.forEach(b => b.addEventListener("click", () => { freq = b.dataset.f; segs.forEach(x => x.setAttribute("aria-pressed", String(x === b))); updateCalc(); }));
-amt.addEventListener("input", updateCalc); dur.addEventListener("input", updateCalc);
+RupyonSections.init();
 applyLang(lang);
 </script>
 </body>

@@ -10,17 +10,26 @@
     display: inline-grid; grid-template-columns: repeat(3, 1fr); padding: 3px; border-radius: 999px; background: rgba(26, 19, 16, .88);
     box-shadow: 0 8px 24px -10px rgba(26, 19, 16, .5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     transition: opacity .3s cubic-bezier(0.23, 1, 0.32, 1), transform .3s cubic-bezier(0.23, 1, 0.32, 1); }
-  .variant[hidden] { display: inline-grid; opacity: 0; transform: translateY(8px); pointer-events: none; }
+  .variant { pointer-events: none; } /* only its buttons catch touches, so the pill never blocks what is behind its gaps */
+  .variant button { pointer-events: auto; }
+  .variant[hidden], .variant.away { display: inline-grid; opacity: 0; transform: translateY(8px); pointer-events: none; }
+  .variant[hidden] button, .variant.away button { pointer-events: none; }
   .variant .vt { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(33.333% - 2px); border-radius: 999px; background: #F97316;
     transform: translateX(calc(var(--at) * 100%)); transition: transform .24s cubic-bezier(0.23, 1, 0.32, 1); }
   .variant button { position: relative; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: #FDF5E9;
     font: 600 13px Inter, "Noto Sans Devanagari", system-ui, sans-serif; white-space: nowrap; cursor: pointer; }
   .variant button:focus-visible { outline: 2px solid #F97316; outline-offset: 2px; }
+  /* a phone: a compact pill, 28px tall with 12px labels, tucked closer to the edge */
+  @media (max-width: 767px) { .variant { padding: 2px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+    .variant .vt { top: 2px; bottom: 2px; left: 2px; width: calc(33.333% - 1.34px); }
+    .variant button { height: 24px; padding: 0 10px; font-size: 12px; } }
   @media (prefers-reduced-motion: reduce) { .variant, .variant .vt { transition: none; } }`;
   document.head.insertAdjacentHTML("beforeend", `<style>${css}</style>`);
   const el = document.createElement("div");
   el.className = "variant"; el.setAttribute("role", "group"); el.setAttribute("aria-label", "Version"); el.style.setProperty("--at", here);
-  const show = on => { el.hidden = !on; el.inert = !on; };
+  let away = false;
+  const inert = () => { el.inert = el.hidden || away; };
+  const show = on => { el.hidden = !on; inert(); };
   show(!framed);
   document.body.appendChild(el);
   const label = () => { const l = document.documentElement.lang === "hi" ? "hi" : "en";
@@ -28,6 +37,15 @@
   label();
   new MutationObserver(label).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   try { localStorage.setItem("rupyon-site", PAGES[here][0]); } catch (e) {}
+
+  /* the pill steps aside while the Start button (or the risk line under it) is within 120px of the bottom of the screen, and in the footer */
+  let queued = false;
+  const check = () => { queued = false; const H = innerHeight;
+    const hit = [...document.querySelectorAll("#start .btn, #start .risk")].some(n => { const r = n.getBoundingClientRect(); return r.top < H && r.bottom > H - 120; });
+    const f = document.querySelector("footer"), inFooter = !!f && f.getBoundingClientRect().top < H;
+    away = hit || inFooter; el.classList.toggle("away", away); inert(); };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(check); } };
+  addEventListener("scroll", queue, { passive: true }); addEventListener("resize", queue); queue();
 
   el.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b || b.dataset.page === PAGES[here][0]) return;
