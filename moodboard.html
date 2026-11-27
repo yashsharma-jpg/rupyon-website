@@ -7,8 +7,8 @@
 <link rel="icon" href="brand/rupyon-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Gelasio is the sheet-headline serif (a Georgia-metric serif, so it sets exactly like the study); Noto Serif Devanagari carries the same headlines in Hindi. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Gelasio:ital,wght@0,500;1,400;1,500&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600&family=Noto+Serif+Devanagari:wght@500;600&family=Noto+Sans+Bengali:wght@600&family=Noto+Sans+Gujarati:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&family=Noto+Sans+Kannada:wght@600&display=swap">
+<!-- The app's fonts only: Anek Latin for headings, Inter for text, Noto Sans for Hindi and the other Indian scripts. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600&family=Noto+Sans+Bengali:wght@600&family=Noto+Sans+Gujarati:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&family=Noto+Sans+Kannada:wght@600&display=swap">
 <style>
 /* Moodboard: the tabletop camera story as the hero (from the motion study), then the same sections as the Original page.
    Scrolling moves a camera over paper sheets taped to a gridded table. Under reduced motion the sheets stack and nothing moves. */
@@ -157,7 +157,7 @@ footer { padding: 120px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64
 u { text-decoration: none; }
 
 :root { --ground: #e1d5bd; --paper: #fff5e1; --paper-shadow: 0 1px 2px #51361e26, 0 6px 18px -7px #51361e5c;
-  --f-serif: "Gelasio", Georgia, "Times New Roman", serif; --f-serif-hi: "Noto Serif Devanagari", "Gelasio", Georgia, serif; }
+  --f-serif: var(--f-head); --f-serif-hi: var(--f-deva); } /* the sheets use the app's heading fonts too */
 html { scroll-padding-top: 0; }
 
 /* masthead and chapter bar (fixed) */
@@ -183,11 +183,11 @@ html { scroll-padding-top: 0; }
 .sheet { position: relative; display: grid; grid-template-columns: 47% 53%; align-items: stretch; isolation: isolate; container-type: size; width: min(80vw, 118svh, 1150px); height: min(50vw, 74svh, 719px); background: var(--paper); color: var(--ink); box-shadow: var(--paper-shadow); }
 .sheet::after { content: ""; position: absolute; z-index: 2; pointer-events: none; width: 12%; height: 4.2%; top: -1.6%; left: 44%; transform: rotate(-4deg); background: #dfc994c9; clip-path: polygon(0 4%, 98% 0, 100% 18%, 98% 34%, 100% 60%, 98% 85%, 100% 98%, 1% 100%, 2% 68%, 0 52%, 2% 29%); }
 .sheet .copy { display: flex; flex-direction: column; justify-content: center; padding: 6cqw 1.5cqw 6cqw 5.3cqw; }
-.sheet .copy h1, .sheet .copy h2 { margin: 0; font: 500 7.6cqw/.91 var(--f-serif); letter-spacing: -.073em; text-wrap: initial; }
-.sheet .copy em { display: block; font-weight: 400; }
+.sheet .copy h1, .sheet .copy h2 { margin: 0; font: 600 7.6cqw/.98 var(--f-serif); letter-spacing: -.01em; text-wrap: initial; }
+.sheet .copy em { display: block; font-style: normal; font-weight: 500; opacity: .78; } /* Anek has no italic: the second line is lighter instead */
 .sheet .copy h1 { font-size: 10.3cqw; }
 .sheet .copy p { margin: 3cqw 0 0; max-width: 27ch; font-size: clamp(15px, 1.85cqw, 23px); line-height: 1.42; }
-:root[lang="hi"] .sheet .copy h1, :root[lang="hi"] .sheet .copy h2 { font-family: var(--f-serif-hi); font-weight: 500; font-size: 6.2cqw; line-height: 1.16; letter-spacing: 0; }
+:root[lang="hi"] .sheet .copy h1, :root[lang="hi"] .sheet .copy h2 { font-family: var(--f-serif-hi); font-weight: 600; font-size: 6.2cqw; line-height: 1.16; letter-spacing: 0; }
 :root[lang="hi"] .sheet .copy h1 { font-size: 8.6cqw; }
 :root[lang="hi"] .sheet .copy p { line-height: 1.6; }
 :root[lang="hi"] .sheet .copy em { font-style: normal; }
@@ -200,7 +200,7 @@ html { scroll-padding-top: 0; }
 .savings::after { left: 72%; transform: rotate(7deg); }
 .ledger { display: grid; place-items: center; }
 .ledger-page { width: 78%; background: #fff7df; padding: 10% 8% 16%; box-shadow: var(--paper-shadow); transform: rotate(5deg); color: #35442b; }
-.ledger-page b, .fee-slip span { display: block; padding-bottom: 8%; border-bottom: 2px solid; font: italic 400 3.1cqw/1 var(--f-serif); }
+.ledger-page b, .fee-slip span { display: block; padding-bottom: 8%; border-bottom: 2px solid; font: 600 3.1cqw/1 var(--f-serif); }
 .ledger-page span { display: flex; justify-content: space-between; padding: 7% 0 3%; border-bottom: 1px solid #98a184; font-size: 1.65cqw; }
 .ledger-page i { font-style: normal; }
 .ledger > img { position: absolute; width: 70%; bottom: 2%; left: -2%; transform: rotate(-13deg); }
@@ -210,8 +210,8 @@ html { scroll-padding-top: 0; }
 .school img { position: absolute; width: 83%; height: 85%; object-fit: contain; bottom: -2%; left: 11%; transform: rotate(7deg); }
 .fee-slip { position: absolute; left: 5%; top: 11%; width: 50%; padding: 6%; background: #ffe1a9; color: #592e1d; box-shadow: var(--paper-shadow); transform: rotate(-8deg); }
 .fee-slip span { font-size: 1.8cqw; border-width: 1px; }
-.fee-slip b { font: 400 4.2cqw var(--f-serif); }
-:root[lang="hi"] .ledger-page b, :root[lang="hi"] .fee-slip span { font-family: var(--f-serif-hi); font-style: normal; font-weight: 500; }
+.fee-slip b { font: 600 4.2cqw var(--f-serif); font-variant-numeric: tabular-nums; }
+:root[lang="hi"] .ledger-page b, :root[lang="hi"] .fee-slip span { font-family: var(--f-serif-hi); font-weight: 600; }
 /* the phone sheet: the hand art sits over the real app screens, which slide behind its screen hole */
 .pay { background: #214c4f; color: #f4efe2; }
 .pay::after { left: 30%; transform: rotate(3deg); }
