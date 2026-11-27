@@ -13,7 +13,7 @@
    and on desktop it becomes words on the left with the scene in a 9:16 window on the right. Colours are Neev's light tokens. */
 :root {
   --canvas: #FDF5E9; --card: #FFFFFF; --ink: #1A1310; --ink-2: #5B4A3F; --ink-3: #8A7666;
-  --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412;
+  --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412; --success-50: #ECFDF3; --success-200: #ABEFC6; --success-600: #079455; --success-700: #067647;
   --f-head: "Anek Latin", "Inter", system-ui, sans-serif;
   --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-deva: "Noto Sans Devanagari", "Noto Sans", "Inter", system-ui, sans-serif;
@@ -79,22 +79,46 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .label { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-700); }
 .sec-head h2 { font-size: 30px; line-height: 1.3; }
 .sec-head .sub { font-size: 17px; color: var(--ink-2); }
-.white { background: var(--card); }
+.white { background: linear-gradient(var(--canvas), var(--card) 120px, var(--card) calc(100% - 120px), var(--canvas)); }
+/* section seams: each band fades into its neighbour instead of cutting. The opener ends in #FBE6C8 on phones, so #moments eases down from it. */
+#moments { background: linear-gradient(var(--canvas), var(--canvas)); }
+@media (max-width: 899px) { #moments { background: linear-gradient(#FBE6C8, var(--canvas) 180px); } }
 
-.moments { display: grid; grid-auto-flow: column; grid-auto-columns: 82%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; }
+.moments { display: grid; grid-auto-flow: column; grid-auto-columns: 84%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; }
 .moments::-webkit-scrollbar { display: none; }
-.moment { scroll-snap-align: center; background: var(--card); border: 1px solid var(--brand-100); border-radius: 16px; box-shadow: 0 1px 2px rgba(26, 19, 16, .05); padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.art { aspect-ratio: 4 / 3; border-radius: 12px; background: var(--brand-50); display: grid; place-items: center; overflow: hidden; }
-.art img { width: 78%; height: 88%; object-fit: contain; }
-.mtop { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
-.who { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; background: var(--brand-100); color: var(--brand-800); }
-.who.bahu { background: var(--brand-200); color: var(--ink); }
+.art { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; background: radial-gradient(120% 90% at 50% 100%, var(--brand-100), var(--brand-50) 70%); display: grid; place-items: center; overflow: hidden; }
+.art::after { content: ""; position: absolute; left: 24%; right: 24%; bottom: 9%; height: 8%; border-radius: 50%; background: rgba(154, 52, 18, .16); filter: blur(6px); }
+.art img { position: relative; z-index: 1; width: auto; height: 86%; max-width: 70%; object-fit: contain; transition: transform .5s var(--ease-out); }
+.art .who, .art .due { position: absolute; top: 10px; z-index: 2; }
+.art .who { left: 10px; }
+.art .due { right: 10px; }
+.who { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--brand-500); color: #fff; }
+.who.bahu { background: var(--brand-800); }
 .who.self { background: var(--ink); color: var(--canvas); }
-:root[lang="hi"] .who { letter-spacing: 0; text-transform: none; font-size: 12px; }
-.amt { font: 600 24px var(--f-head); font-variant-numeric: tabular-nums; color: var(--brand-800); }
-.moment .mline { font: 600 19px/1.35 var(--f-head); }
-:root[lang="hi"] .moment .mline { font-family: var(--f-deva); line-height: 1.45; }
-.moment .saved { font-size: 13px; color: var(--ink-3); border-top: 1px dashed var(--brand-200); padding-top: 8px; margin-top: auto; }
+.due { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .92); color: var(--ink-2); }
+:root[lang="hi"] .who { letter-spacing: 0; text-transform: none; font-size: 13px; }
+.mbody { display: flex; flex-direction: column; gap: 6px; padding: 14px 4px 0; }
+.mtitle { font: 600 22px/1.25 var(--f-head); letter-spacing: -.01em; }
+:root[lang="hi"] .mtitle { font-family: var(--f-deva); line-height: 1.4; letter-spacing: 0; }
+.moment .mline { font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+:root[lang="hi"] .moment .mline { line-height: 1.6; }
+.mamt { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+.amt { font: 600 34px/1 var(--f-head); font-variant-numeric: tabular-nums; color: var(--brand-800); }
+.rdy { font-size: 14px; font-weight: 600; color: var(--success-700); }
+.bar { display: flex; gap: 2px; height: 10px; margin-top: 6px; }
+.bar i { flex: 1; min-width: 0; border-radius: 3px; background: var(--brand-100); transition: background-color .3s ease calc(var(--j) * 24ms); }
+.moment.in .bar i { background: var(--brand-500); }
+.build { font-size: 14px; font-weight: 500; color: var(--ink-3); }
+.bank { display: flex; align-items: center; gap: 8px; margin: 14px 4px 2px; padding-top: 12px; border-top: 1px dashed var(--brand-200); font-size: 14px; font-weight: 500; color: var(--ink-2); margin-top: auto; }
+.mbody { padding-bottom: 14px; }
+.bank svg { flex: none; color: var(--success-700); }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } .art img { transition: none; } }
+.moment { scroll-snap-align: center; background: var(--card); border: 1px solid var(--brand-100); border-radius: 18px; box-shadow: 0 1px 2px rgba(26, 19, 16, .05), 0 18px 30px -26px rgba(154, 52, 18, .4); padding: 10px; display: flex; flex-direction: column; min-width: 0; }
+.mdots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+.mdots i { width: 8px; height: 8px; border-radius: 4px; background: var(--brand-200); transition: width .3s ease, background-color .3s ease; }
+.mdots i.on { width: 24px; background: var(--brand-500); }
+.moments:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 4px; border-radius: 12px; }
+@media (min-width: 900px) { .mdots { display: none; } .moment { padding: 12px; } }
 
 .calc { display: grid; gap: 16px; background: var(--canvas); border: 1px solid var(--brand-100); border-radius: 20px; padding: 20px; }
 .calc-in { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
@@ -107,11 +131,21 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .calc input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--brand-500); }
 .calc-out { background: var(--card); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .olabel { font-size: 14px; color: var(--ink-2); }
-.total { font: 600 44px/1.15 var(--f-head); color: var(--brand-800); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.total { font: 600 44px/1.15 var(--f-head); color: var(--success-700); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .osub { font-size: 15px; color: var(--ink-2); }
 .fine { font-size: 12px; color: var(--ink-3); margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--brand-200); }
 :root[lang="hi"] .seg button { font-family: var(--f-deva); }
 .note-line { font-size: 15px; color: var(--ink-2); }
+#language { background: linear-gradient(var(--canvas), var(--card) 120px, var(--card) calc(100% - 160px), var(--brand-100)); }
+/* #rhythm is the one green section: Untitled success tints, edges fade to/from the cream canvas */
+#rhythm { background: linear-gradient(var(--canvas), var(--success-50) 160px, var(--success-50) calc(100% - 160px), var(--canvas)); }
+#rhythm .label { color: var(--success-700); }
+#rhythm .calc { background: rgba(255, 255, 255, .55); border-color: var(--success-200); }
+#rhythm .seg { border-color: var(--success-200); }
+#rhythm .seg .thumb, #rhythm .seg button[aria-pressed="true"] { background: var(--success-700); }
+#rhythm .calc input[type=range] { accent-color: var(--success-600); }
+#rhythm .fine { border-top-color: var(--success-200); }
+#rhythm .calc-out .mk { filter: grayscale(1) sepia(1) hue-rotate(75deg) saturate(2.2); }
 
 .trust { display: grid; gap: 12px; }
 .tcard { background: var(--card); border: 1px solid var(--brand-100); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
@@ -127,14 +161,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .lang:lang(kn) { font-family: "Noto Sans Kannada", sans-serif; }
 .lang:lang(mr), .lang:lang(hi) { font-family: var(--f-deva); }
 
-.start { background: var(--brand-500); color: #fff; }
+.start { background: var(--brand-500); color: #fff; border-radius: 32px 32px 0 0; margin-top: -32px; }
 .start .sec-in { align-items: center; text-align: center; }
 .start h2 { font-size: 34px; line-height: 1.3; }
 .start .sub { color: #FFEDD5; font-size: 17px; }
 .start .btn { background: #fff; color: var(--brand-800); }
 .start .btn:hover { background: var(--brand-50); }
 .start .risk { color: #FFEDD5; max-width: 46ch; }
-footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64px); display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; color: var(--ink-3); font-size: 13px; }
+footer { padding: 120px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64px); background: linear-gradient(var(--brand-500), var(--canvas) 120px); display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; color: var(--ink-3); font-size: 13px; }
 
 @media (min-width: 900px) {
   :root { --gutter: max(48px, calc((100vw - 1200px) / 2)); }
@@ -153,7 +187,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
   .rail { display: none; }
   .sec { padding-block: 112px; padding-left: var(--gutter); padding-right: var(--gutter); }
   .sec-head h2 { font-size: 40px; }
-  .moments { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .moments { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; overflow: visible; margin-inline: 0; padding-inline: 0; }
   .trust { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .calc { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; padding: 28px; }
   .calc-out { justify-content: center; padding: 28px; }
@@ -194,7 +228,8 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
   <section class="sec" id="moments" aria-labelledby="moments-h">
     <div class="sec-in">
       <div class="sec-head"><span class="label" data-t="mLabel">Maa hai na</span><h2 id="moments-h" data-t="mTitle">Money ready when it’s needed.</h2><p class="sub" data-t="mSub">Money she put aside days and months ago, there when the family needs it.</p></div>
-      <div class="moments" id="moment-list"></div>
+      <div class="moments" id="moment-list" tabindex="0" role="region" aria-label="Moments"></div>
+      <div class="mdots" id="mdots" aria-hidden="true"></div>
     </div>
   </section>
 
@@ -265,12 +300,12 @@ const { C, CREAM, DEFS, beats, setLang } = DabbaScenes;
 
 /* the seven beats; w is each beat's share of the scroll */
 const BEATS = [
-  { w: 1.3, line: { en: "Save from ₹100, on its own.", hi: "₹100 से बचत, अपने आप।" }, pos: "bottom" },
+  { w: 1.3, line: { en: "Saving starts at ₹100.", hi: "बचत शुरू, सिर्फ़ ₹100 से।" }, pos: "bottom" },
   { w: 2 },
   { w: 2 },
-  { w: 2.2, line: { en: "Mum’s tin. Now on her phone too.", hi: "मम्मी का डब्बा, अब फ़ोन में भी।" }, pos: "top" },
+  { w: 2.2, line: { en: "₹9,000 saved in 90 days.", hi: "90 दिन में ₹9,000 जमा।" }, pos: "top" },
   { w: 1.7, bg: "#FFFFFF", line: { en: "Fees due on Friday.", hi: "शुक्रवार तक फ़ीस भरनी है।" }, pos: "top" },
-  { w: 2.6, line: { en: "Saved months ago. There when it’s needed.", hi: "महीनों पहले बचाया, ज़रूरत पर काम आया।" }, pos: "top" },
+  { w: 2.6, line: { en: "Saved for months. Ready today.", hi: "महीनों की बचत, आज काम आई।" }, pos: "top" },
   { w: 2.2, line: { en: "Maa’s got it.", hi: "माँ है ना।" }, pos: "top", cta: true },
 ].map((b, i) => ({ ...b, draw: beats[i] }));
 
@@ -329,19 +364,38 @@ const STR = {
     sTitle: "₹100 से शुरू करें।", sSub: "एक बार सेट करें, बचत अपने आप होगी।" },
 };
 const MOMENTS = [
-  { who: "maa", amt: "₹1,500", art: "need-school-bag", en: "Fees due? Maa’s got it.", hi: "फ़ीस भरनी है? माँ है ना।", saved: { en: "Saved ₹100 a day since July", hi: "जुलाई से ₹100 रोज़ बचाए" } },
-  { who: "maa", amt: "₹900", art: "need-gas-cylinder", en: "Out of gas? Maa’s got it.", hi: "गैस ख़त्म? माँ है ना।", saved: { en: "Saved ₹200 a week since August", hi: "अगस्त से ₹200 हर हफ़्ते बचाए" } },
-  { who: "bahu", amt: "₹650", art: "need-medicine", en: "Papa ji’s medicines? Bahu’s got it.", hi: "पापा जी की दवाई? बहू है ना।", saved: { en: "Saved ₹500 a month since June", hi: "जून से ₹500 हर महीने बचाए" } },
-  { who: "maa", amt: "₹2,400", art: "need-festive-clothes", en: "New clothes for Diwali? Maa’s got it.", hi: "दिवाली के नए कपड़े? माँ है ना।", saved: { en: "Saved ₹100 a day since Raksha Bandhan", hi: "रक्षाबंधन से ₹100 रोज़ बचाए" } },
-  { who: "maa", amt: "₹4,800", art: "need-bicycle", en: "A cycle for school? Maa’s got it.", hi: "स्कूल की साइकिल? माँ है ना।", saved: { en: "Saved ₹1,000 a month since April", hi: "अप्रैल से ₹1,000 हर महीने बचाए" } },
-  { who: "self", amt: "₹6,500", art: "need-sewing-machine", en: "A sewing machine. For herself too.", hi: "सिलाई मशीन। अपने लिए भी।", saved: { en: "Saved ₹1,000 a month since January", hi: "जनवरी से ₹1,000 हर महीने बचाए" } },
+  { who: "maa", art: "need-school-bag", amt: 3000, per: 100, unit: "day", n: 30, title: { en: "School fees", hi: "स्कूल की फ़ीस" }, due: { en: "Due Friday", hi: "शुक्रवार तक" }, line: { en: "No borrowing and no asking anyone.", hi: "न उधार, न किसी से माँगना।" } },
+  { who: "maa", art: "need-gas-cylinder", amt: 900, per: 300, unit: "week", n: 3, title: { en: "Gas cylinder", hi: "गैस सिलेंडर" }, due: { en: "Ran out today", hi: "आज ख़त्म हुआ" }, line: { en: "Empty cylinder, and no worry.", hi: "सिलेंडर ख़त्म, पर कोई फ़िक्र नहीं।" } },
+  { who: "bahu", art: "need-medicine", amt: 1500, per: 500, unit: "month", n: 3, title: { en: "Papa ji’s medicines", hi: "पापा जी की दवाइयाँ" }, due: { en: "This week", hi: "इसी हफ़्ते" }, line: { en: "Bought without asking anyone.", hi: "बिना किसी से कहे ख़रीदीं।" } },
+  { who: "maa", art: "need-festive-clothes", amt: 2400, per: 100, unit: "day", n: 24, title: { en: "Diwali clothes", hi: "दिवाली के कपड़े" }, due: { en: "Before Diwali", hi: "दिवाली से पहले" }, line: { en: "New clothes for the whole house.", hi: "पूरे घर के लिए नए कपड़े।" } },
+  { who: "maa", art: "need-bicycle", amt: 4800, per: 800, unit: "month", n: 6, title: { en: "A cycle for school", hi: "स्कूल की साइकिल" }, due: { en: "New term", hi: "नया सत्र" }, line: { en: "No more long walk to school.", hi: "अब स्कूल तक पैदल नहीं।" } },
+  { who: "self", art: "need-sewing-machine", amt: 6000, per: 1000, unit: "month", n: 6, title: { en: "A sewing machine", hi: "सिलाई मशीन" }, due: { en: "For herself", hi: "अपने लिए" }, line: { en: "Her own work on her own machine.", hi: "अपना काम, अपनी मशीन।" } },
 ];
 const WHO = { en: { maa: "Maa", bahu: "Bahu", self: "Herself" }, hi: { maa: "माँ", bahu: "बहू", self: "अपने लिए" } };
+const UNIT = { en: { day: ["a day", "days"], week: ["a week", "weeks"], month: ["a month", "months"] }, hi: { day: ["रोज़", "दिन"], week: ["हर हफ़्ते", "हफ़्ते"], month: ["हर महीने", "महीने"] } };
+const MSTR = { en: { rdy: "ready", bank: "Goes to her own bank account" }, hi: { rdy: "तैयार", bank: "सीधे अपने बैंक खाते में" } };
+const rupee = n => "₹" + n.toLocaleString("en-IN");
+function buildText(m, l) { const u = UNIT[l][m.unit]; return l === "hi" ? `${u[0]} ${rupee(m.per)}, ${m.n} ${u[1]} तक` : `${rupee(m.per)} ${u[0]} for ${m.n} ${u[1]}`; }
 const ART = window.DABBA_ASSETS;
+const BANK_ICON = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 7l7-4 7 4M3.5 7.5v5M7 7.5v5M11 7.5v5M14.5 7.5v5M2 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function momentCard(m, i, attrs) {
+  const b = buildText(m, lang);
+  return `<article class="moment"${attrs || ""} data-i="${i}"><div class="art"><span class="who ${m.who === "maa" ? "" : m.who}">${WHO[lang][m.who]}</span><span class="due">${m.due[lang]}</span><img src="${ART}${m.art}.png" alt="" loading="lazy" width="512" height="512"></div>
+    <div class="mbody"><h3 class="mtitle">${m.title[lang]}</h3><p class="mline">${m.line[lang]}</p>
+    <div class="mamt"><span class="amt">${rupee(m.amt)}</span><span class="rdy">${MSTR[lang].rdy}</span></div>
+    <div class="bar" role="img" aria-label="${b}">${Array.from({ length: m.n }, (_, j) => `<i style="--j:${j}"></i>`).join("")}</div><p class="build">${b}</p></div>
+    <p class="bank">${BANK_ICON}${MSTR[lang].bank}</p></article>`;
+}
 function renderMoments() {
-  document.getElementById("moment-list").innerHTML = MOMENTS.map(m => `<article class="moment"><div class="art"><img src="${ART}${m.art}.png" alt="" loading="lazy" width="512" height="512"></div>
-    <div class="mtop"><span class="who ${m.who === "maa" ? "" : m.who}">${WHO[lang][m.who]}</span><span class="amt">${m.amt}</span></div>
-    <p class="mline">${m[lang]}</p><p class="saved">${m.saved[lang]}</p></article>`).join("");
+  const list = document.getElementById("moment-list"), dots = document.getElementById("mdots");
+  list.innerHTML = MOMENTS.map((m, i) => momentCard(m, i)).join("");
+  dots.innerHTML = MOMENTS.map(() => "<i></i>").join("");
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cards = [...list.children];
+  if (calm) { cards.forEach(c => c.classList.add("in")); }
+  else { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .6 }); cards.forEach(c => io.observe(c)); }
+  const mark = () => { const mid = list.scrollLeft + list.clientWidth / 2; let best = 0, d = 1e9; cards.forEach((c, i) => { const x = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid); if (x < d) { d = x; best = i; } }); [...dots.children].forEach((e, i) => e.classList.toggle("on", i === best)); };
+  list.onscroll = mark; mark();
 }
 
 /* ---------- language switch: English first, remembered on this device ---------- */

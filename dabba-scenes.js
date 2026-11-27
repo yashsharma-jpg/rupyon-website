@@ -8,7 +8,7 @@
   const C = t => Math.min(1, Math.max(0, t));
   const L = (a, b, t) => a + (b - a) * t;
   const INK = "#1A1310", ORANGE = "#F97316", CREAM = "#FDF5E9", RED = "#B42318", SKIN = "#C68A5E", SKIN2 = "#B87B50";
-  const DEFS = `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDF5E9"/><stop offset="1" stop-color="#FBE6C8"/></linearGradient></defs>`;
+  const DEFS = `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDF5E9"/><stop offset="1" stop-color="#FBE6C8"/></linearGradient><linearGradient id="pgshade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1A1310" stop-opacity="0"/><stop offset="1" stop-color="#1A1310" stop-opacity=".25"/></linearGradient></defs>`;
   let CID = 0;
 
   /* words drawn inside the scenes, in each page language. The Hindi is a draft for native review */
@@ -122,10 +122,10 @@
   /* the Turn mark flares behind the tick. It is the file from public/brand, never redrawn */
   function flare(cx, cy, q) { if (q <= 0 || q >= 1) return ""; const s = L(16, 120, E(q)); return `<image href="${TURN}" x="${cx - s / 2}" y="${cy - s / 2}" width="${s}" height="${s}" opacity="${(1 - q) * 0.9}"/>`; }
   function tokens(op) {
-    const items = [["अ", 66, 196], ["ক", 294, 214], ["ગ", 52, 330], ["த", 308, 350], ["తె", 74, 452], ["ಕ", 292, 480], ["म", 178, 162]];
+    const items = [["अ", 40, 170], ["ক", 320, 196], ["ગ", 38, 318], ["த", 322, 330], ["తె", 42, 456], ["ಕ", 320, 470], ["म", 322, 92]];
     let s = `<g opacity="${op}">`;
     items.forEach(([g, x, y], i) => { s += `<circle cx="${x}" cy="${y}" r="24" fill="${i % 2 ? "#FED7AA" : "#FFEDD5"}" stroke="#F3DFC4"/><text x="${x}" y="${y + 7}" text-anchor="middle" font-family="Noto Sans Devanagari, Noto Sans Bengali, Noto Sans Gujarati, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, sans-serif" font-size="19" font-weight="600" fill="${INK}">${g}</text>`; });
-    [[tr("daily"), 86, 262], [tr("weekly"), 282, 284], [tr("monthly"), 82, 398]].forEach(([t, x, y]) => { const w = t.length * 8 + 22; s += `<rect x="${x - w / 2}" y="${y - 15}" width="${w}" height="30" rx="15" fill="${ORANGE}"/>` + ui(x, y + 5, 12, "#fff", t); });
+    [[tr("daily"), 52, 248], [tr("weekly"), 316, 262], [tr("monthly"), 52, 388]].forEach(([t, x, y]) => { const w = t.length * 8 + 22; s += `<rect x="${x - w / 2}" y="${y - 15}" width="${w}" height="30" rx="15" fill="${ORANGE}"/>` + ui(x, y + 5, 12, "#fff", t); });
     return s + `<rect x="250" y="404" width="104" height="30" rx="15" fill="${INK}"/>` + ui(302, 424, 12, "#fff", tr("inName")) + `</g>`;
   }
   function cta(op, label) {
@@ -148,42 +148,83 @@
       return s; };
   }
 
-  /* ---------- the seven beats, each a function of p, 0 to 1 through the beat ---------- */
+  /* ---------- the one phone ----------
+     Every beat that shows the app draws THIS device. Its screen is one app: pages push in and out (never two screens faded over each other), the status
+     bar stays put, and the hand PNGs are stretched so their screen hole is exactly this screen (sx 70, sy 146, 200 x 390), so the hand "takes" the same phone.
+     Page images are the real app screens; sip-setup-fit.jpg is sip-setup.jpg with blank rows taken out so it matches the screen's shape. */
+  const PG = { sip: ["sip-setup-fit", "#FFFFFF", "top", 1521 / 780], sips: ["sips", "#F8FEFA", "top", 1516 / 780], red: ["redeem", "#FFFFFF", "bot", 1382 / 780], done: ["redeem-done", "#FFFFFF", "bot", 1382 / 780],
+    welcome: ["welcome", "#FCF6E8", "top", 1740 / 780], lang: ["language", "#FCF6E8", "top", 1740 / 780] };
+  const PRESS = { sip: [0.916, 0.064], red: [0.921, 0.059] }, TAPAT = { sip: [0.5, 0.95], red: [0.69, 0.925] };
+  const P = (p, a, b) => C((p - a) / (b - a)), EI = t => t * t * t;
+  function device(o) {
+    const { sx = 70, sy = 146, w = 200, h = 390, off = 0, reveal = 1, pages = [], press = null, tap = null, hand = null, shadow = false } = o;
+    const id = ++CID, R = w * 0.1, B = w * 0.055, cx = sx + w / 2, cy = sy + h / 2;
+    let g = `<g transform="translate(0 ${off})">`;
+    if (shadow) g += `<ellipse cx="${cx}" cy="${sy + h + B + 8}" rx="${w * 0.42}" ry="7" fill="${INK}" opacity=".12"/>`;
+    g += `<rect x="${sx - B}" y="${sy - B}" width="${w + 2 * B}" height="${h + 2 * B}" rx="${R + B}" fill="#382E29"/>`
+      + `<clipPath id="sc${id}"><rect x="${sx}" y="${sy}" width="${w}" height="${h}" rx="${R}"/></clipPath><clipPath id="rv${id}"><circle cx="${cx}" cy="${cy}" r="${Math.max(0, reveal) * h * 0.9}"/></clipPath>`
+      + `<g clip-path="url(#sc${id})"><rect x="${sx}" y="${sy}" width="${w}" height="${h}" fill="${INK}"/>` + (reveal > 0 ? `<g${reveal < 1 ? ` clip-path="url(#rv${id})"` : ""}>` : "<g display=\"none\">");
+    pages.forEach(([k, dx]) => {
+      const [n, bg, an, r] = PG[k], ih = w * r, x = sx + dx * w, iy = an === "top" ? sy : sy + h - ih;
+      g += `<rect x="${x}" y="${sy}" width="${w}" height="${h}" fill="${bg}"/>` + (dx > 0.001 && dx < 0.999 ? `<rect x="${x - 10}" y="${sy}" width="10" height="${h}" fill="url(#pgshade)"/>` : "")
+        + `<image href="${SHOTS}${n}.jpg" x="${x}" y="${iy}" width="${w}" height="${ih}" preserveAspectRatio="none"/>`;
+      if (press && press.k === k && press.op > 0) { const [t, ph] = PRESS[k]; g += `<rect x="${x + w * 0.031}" y="${sy + h * t}" width="${w * 0.938}" height="${h * ph}" rx="9" fill="#8A3208" opacity="${press.op}" style="mix-blend-mode:multiply"/>`; }
+      if (tap && tap.k === k && tap.q > 0 && tap.q < 1) { const [fx, fy] = TAPAT[k]; g += `<circle cx="${x + w * fx}" cy="${sy + h * fy}" r="${L(6, 24, tap.q)}" fill="#fff" opacity="${0.8 * (1 - tap.q)}"/>`; }
+    });
+    /* status bar: it never moves while pages push under it */
+    g += `<text x="${sx + 16}" y="${sy + 13}" font-family="Inter, sans-serif" font-weight="600" font-size="8.5" fill="${INK}">9:41</text>`
+      + `<g fill="${INK}"><rect x="${sx + w - 46}" y="${sy + 10}" width="2" height="2"/><rect x="${sx + w - 42}" y="${sy + 8}" width="2" height="4"/><rect x="${sx + w - 38}" y="${sy + 6}" width="2" height="6"/><rect x="${sx + w - 34}" y="${sy + 4}" width="2" height="8"/>`
+      + `<rect x="${sx + w - 20}" y="${sy + 5}" width="10" height="7" rx="2" fill="none" stroke="${INK}" stroke-width="1"/><rect x="${sx + w - 18.6}" y="${sy + 6.4}" width="6.4" height="4.2" rx="1"/></g></g></g>`;
+    if (hand) {
+      const Hd = HANDS[hand.kind], ax = w / Hd.w, ay = h / Hd.h, hid = "hw" + id;
+      g += `<clipPath id="${hid}"><rect x="-200" y="${L(700, -100, hand.wipe == null ? 1 : hand.wipe)}" width="800" height="900"/></clipPath><g clip-path="url(#${hid})"${hand.op != null && hand.op < 1 ? ` opacity="${hand.op}"` : ""}>`
+        + im(Hd.n, sx - Hd.x * ax, sy - Hd.y * ay, 1024 * ax, 1536 * ay) + `</g>`;
+    }
+    return g + `</g>`;
+  }
+
+  /* ---------- the seven beats, each a function of p, 0 to 1 through the beat. Every beat moves, then rests: nothing is mid-blend while it holds ---------- */
   const NOTE_X = [-22, -7, 8, 22], NOTE_R = [-10, -3, 4, 11];
+  const SKY = `<rect x="-400" y="-400" width="1160" height="1440" fill="url(#sky)"`;
   const beats = [
     /* 1 Hero */
-    p => pills(p) + `<ellipse cx="180" cy="470" rx="80" ry="8" fill="${INK}" opacity=".1"/>` + phone(180, 140, 150, 320, shot("welcome")),
-    /* 2 Days add up */
+    p => pills(p) + device({ sx: 80, sy: 100, h: 446, shadow: true, pages: [["welcome", 0]] }),
+    /* 2 Days add up. The hero phone leaves, the kitchen fades up, the tin comes in */
     p => { const up = E(C(p / 0.25)), lift = E(C((p - 0.18) / 0.15)); let ins = "";
       NOTE_X.forEach((dx, i) => { const f = E(C((p - 0.32 - i * 0.12) / 0.14)); if (f > 0) ins += rnote(180 + dx, L(40, 344, f), 72, NOTE_R[i] * f); });
       const day = p < 0.3 ? 1 : Math.round(L(1, 90, E(C((p - 0.3) / 0.6))));
-      return wall() + shelf() + `<g opacity="${C(p * 4)}" transform="translate(0 ${L(70, 0, up)})">` + tinImg({ lid: 90 * lift, lidX: -64 * lift, lidRot: -14 * lift, inside: ins }) + `</g>` + dayTile(day, C((p - 0.22) * 6)); },
-    /* 3 Into the phone */
-    p => { const drop = 1 - E(C(p / 0.18)), orange = C((p - 0.18) / 0.18), rise = E(p * 1.6), sink = E((p - 0.25) * 1.6), fade = 1 - C(p * 2.2), show = C((p - 0.6) * 3);
-      return wall(fade) + shelf(fade) + phone(180, L(660, 150, rise), 150, 320, shot("sip-setup", show))
-        + `<g opacity="${1 - show}">` + tinImg({ cx: 180, base: L(SHELF_BASE, 156 + 308 * 0.74, sink), w: L(124, 138 * 0.46, sink), orange, shadow: sink < 0.5, lid: 90 * drop, lidX: -64 * drop, lidRot: -14 * drop }) + `</g>`; },
-    /* 4 In her hand */
-    p => { const z = L(1.12, 1, E(p));
-      return `<g transform="translate(180 330) scale(${z}) translate(-180 -330)">` + wall() + shelf(1, false) + tinImg({ cx: 66, w: 64 }) + rings(225, 333, p) + handPhone("hold", 140, 168, 170, shot("sips")) + `</g>`; },
-    /* 5 The need */
-    p => { const up = E(C(p / 0.35)), pop = 1 + 0.04 * Math.sin(Math.PI * C((p - 0.35) / 0.2));
-      return `<circle cx="180" cy="400" r="${L(130, 180, up)}" fill="${CREAM}"/><g transform="translate(0 ${L(70, 0, up)})"><g transform="translate(180 505) scale(${pop}) translate(-180 -505)">` + girl("₹1,500") + `</g></g>`; },
-    /* 6 Maa hai na */
-    p => { const shrink = E((p - 0.66) * 3), s = L(1, 0.62, shrink), fly = E(C((p - 0.32) / 0.26)), slipOp = C((p - 0.26) * 8) * (1 - C(shrink * 3)), tick = C((p - 0.56) / 0.12);
-      const press = C((p - 0.1) / 0.08) * (1 - C((p - 0.24) / 0.06)), [tx, ty] = handTip("thumb", 65, 156, 230);
-      const card = shrink > 0 ? `<g opacity="${shrink}"><rect x="34" y="84" width="292" height="490" rx="28" fill="#FED7AA"/>` + ui(56, 122, 16, INK, tr("cardTitle"), "start") + ui(56, 143, 11.5, "#8A7666", tr("cardSub"), "start", 500) + `</g>` : "";
-      const note = fly > 0 && fly < 1 ? fnote(L(180, 290, fly), L(330, 166, fly) - 60 * Math.sin(Math.PI * fly), L(44, 24, fly), L(0, 28, fly)) : "";
-      const ripple = press > 0 ? `<circle cx="${tx}" cy="${ty + 22}" r="${L(4, 22, press)}" fill="#fff" opacity="${0.5 * press}"/>` : "";
-      return card + `<g transform="translate(180 ${L(330, 450, shrink)}) scale(${s}) translate(-180 -330)">` + handPhone("thumb", 65, 156, 230, withdrawScreen(p), "#fff") + ripple + `</g>`
-        + (slipOp > 0 ? `<g opacity="${slipOp}">` + flare(306, 176, C((p - 0.56) / 0.22)) + slip(250, 96, 74, "₹1,500", tick) + `</g>` : "") + note; },
-    /* 7 Everywhere */
-    p => tokens(E(p * 2)) + phone(180, 200, 120, 256, shot("language")),
+      const leave = p < 0.2 ? device({ sx: 80, sy: 100, h: 446, off: L(0, 720, EI(P(p, 0, 0.2))), pages: [["welcome", 0]] }) : "";
+      return wall(E(P(p, 0.02, 0.2))) + shelf(E(P(p, 0.02, 0.2))) + `<g opacity="${C((p - 0.1) * 4)}" transform="translate(0 ${L(70, 0, E(C((p - 0.1) / 0.25)))})">` + tinImg({ lid: 90 * lift, lidX: -64 * lift, lidRot: -14 * lift, inside: ins }) + `</g>` + dayTile(day, C((p - 0.22) * 6)) + leave; },
+    /* 3 Into the phone. The lid closes, her phone rises dark, the tin lands on it and turns into the app; then it rests on Start SIP */
+    p => { const drop = 1 - E(C(p / 0.12)), orange = P(p, 0.06, 0.18), fade = 1 - C(p * 2.2), sink = E(P(p, 0.26, 0.52)), gone = P(p, 0.56, 0.7);
+      const tw = L(124, 55, sink) * L(1, 0.2, E(gone));
+      return wall(fade) + shelf(fade) + device({ off: L(720, 0, E(P(p, 0.14, 0.44))), reveal: E(P(p, 0.58, 0.8)), pages: [["sip", 0]], shadow: true })
+        + `<g opacity="${1 - gone}">` + tinImg({ cx: L(180, 170, sink), base: L(SHELF_BASE, 372, sink), w: tw, orange, shadow: sink < 0.5, lid: 90 * drop * (1 - sink), lidX: -64 * drop * (1 - sink), lidRot: -14 * drop * (1 - sink) }) + `</g>`; },
+    /* 4 In her hand. The hand comes round the same phone, Set up AutoPay is pressed, the app pushes on to her SIPs, and it rests */
+    p => { const push = E(P(p, 0.54, 0.72)), q = P(p, 0.4, 0.54);
+      return rings(170, 341, p) + device({ hand: { kind: "hold", wipe: E(P(p, 0.04, 0.3)) }, pages: push > 0 ? [["sip", -0.28 * push], ["sips", 1 - push]] : [["sip", 0]],
+        press: { k: "sip", op: 0.55 * P(p, 0.42, 0.47) * (1 - P(p, 0.5, 0.55)) }, tap: { k: "sip", q } }); },
+    /* 5 The need. The phone drops away with the hand, her daughter and the fee arrive */
+    p => { const up = E(C(p / 0.35)), pop = 1 + 0.04 * Math.sin(Math.PI * C((p - 0.35) / 0.2)), a = P(p, 0.12, 0.3), off = L(0, 720, EI(P(p, 0, 0.3)));
+      return `<g opacity="${1 - E(P(p, 0, 0.3))}">${SKY}/></g>` + (off < 719 ? device({ off, hand: { kind: "hold" }, pages: [["sips", 0]] }) : "")
+        + `<g opacity="${a}"><circle cx="180" cy="400" r="${L(130, 180, up)}" fill="${CREAM}"/><g transform="translate(0 ${L(70, 0, up)})"><g transform="translate(180 505) scale(${pop}) translate(-180 -505)">` + girl("₹1,500") + `</g></g></g>`; },
+    /* 6 Maa hai na. The phone comes back in her thumb's pose on Withdraw; the thumb presses Continue, the app pushes to Money credited, the money goes to the fee slip, which is paid; it rests */
+    p => { const push = E(P(p, 0.54, 0.7)), q = P(p, 0.4, 0.54), off = L(720, 0, E(P(p, 0.06, 0.3))), fq = P(p, 0.66, 0.84);
+      const fly = E(P(p, 0.58, 0.76)), slipOp = P(p, 0.74, 0.82), tick = P(p, 0.84, 0.92), bq = P(p, 0.62, 0.86);
+      const note = fly > 0 && fly < 1 ? fnote(L(170, 306, fly), L(330, 112, fly) - 50 * Math.sin(Math.PI * fly), L(46, 22, fly), L(0, 24, fly)) : "";
+      return `<g opacity="${1 - E(P(p, 0, 0.2))}"><rect x="-400" y="-400" width="1160" height="1440" fill="#fff"/></g>` + rays(170, 340, L(80, 140, E(bq)), L(130, 200, E(bq)), bq > 0 && bq < 1 ? Math.sin(Math.PI * bq) * 0.9 : 0, 14)
+        + device({ off, hand: { kind: "thumb", wipe: 1 }, pages: push > 0 ? [["red", -0.28 * push], ["done", 1 - push]] : [["red", 0]],
+          press: { k: "red", op: 0.55 * P(p, 0.42, 0.47) * (1 - P(p, 0.5, 0.55)) }, tap: { k: "red", q } })
+        + note + (slipOp > 0 ? `<g opacity="${slipOp}" transform="rotate(4 306 112)">` + flare(326, 132, P(p, 0.84, 0.98)) + slip(268, 70, 76, "₹1,500", tick) + `</g>` : ""); },
+    /* 7 Everywhere. The phone and the slip leave, the language phone rises, every language round it */
+    p => { const off = L(0, 720, EI(P(p, 0, 0.26))), leaving = off < 719 ? device({ off, hand: { kind: "thumb", wipe: 1 }, pages: [["done", 0]] }) + `<g opacity="${1 - P(p, 0, 0.2)}" transform="rotate(4 306 112)">` + slip(268, 70, 76, "₹1,500", 1) + `</g>` : "";
+      return leaving + device({ sx: 80, sy: 90, h: 446, off: L(720, 0, E(P(p, 0.3, 0.58))), pages: [["lang", 0]], shadow: true }) + tokens(E(C((p - 0.45) * 2))); },
   ];
 
   const FILES = ["dabba-kitchen-wall", "dabba-shelf", "dabba-tin-body", "dabba-tin-lid-steel", "dabba-tin-lid-orange", "dabba-note-rolled", "dabba-note-flat", "dabba-jar-left", "dabba-jar-right",
     "hand-phone-hold-woman-screen", "hand-phone-thumb-woman-screen", "dabba-daughter-slip"];
   /* decode the illustrations once, so scrubbing doesn't flash */
-  function preload() { FILES.forEach(n => { new Image().src = IMG + n + ".png"; }); const t = new Image(); t.src = TURN; }
+  function preload() { FILES.forEach(n => { new Image().src = IMG + n + ".png"; }); ["sip-setup-fit", "sips", "redeem", "redeem-done", "welcome", "language"].forEach(n => { new Image().src = SHOTS + n + ".jpg"; }); const t = new Image(); t.src = TURN; }
 
   const setLang = l => { LANG = STR[l] ? l : "en"; };
 
