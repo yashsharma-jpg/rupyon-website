@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rupyon · Maa hai na</title>
+<link rel="icon" href="brand/rupyon-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600&family=Noto+Sans+Bengali:wght@600&family=Noto+Sans+Gujarati:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&family=Noto+Sans+Kannada:wght@600&display=swap">
 <style>
 /* Rupyon site, variation "Kiwi beats": the same story and order as site.html, moved the way Liquidink's Kiwi site moves.
    The scroll drives the story (GSAP ScrollTrigger, scrubbed, so it plays backwards too); small things keep a beat of their
-   own in CSS (the Turn mark, the orbit of words, the pulses, the marquee) so they stay smooth while the page is busy. */
+   own in CSS (the Rupyon R's heartbeat, the orbit of words, the pulses, the marquee) so they stay smooth while the page is busy. */
 :root {
   --canvas: #FDF5E9; --card: #FFFFFF; --ink: #1A1310; --ink-2: #5B4A3F; --ink-3: #8A7666;
   --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412;
@@ -20,7 +21,7 @@
   --gutter: max(16px, env(safe-area-inset-left, 0px));
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --beat: 1.4s; /* two beats: the mark turns 45 degrees every 0.7s, as Kiwi's mark shifts shape */
+  --beat: 1.4s; /* the Rupyon R keeps a heartbeat, lub-dub every 1.4s, as Kiwi's mark keeps its beat */
   color-scheme: light;
 }
 * { box-sizing: border-box; }
@@ -52,9 +53,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .nav { position: fixed; z-index: 20; inset: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--gutter) 12px; pointer-events: none; }
 .nav > * { pointer-events: auto; }
 .logo { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 600 22px var(--f-head); letter-spacing: -0.02em; }
-.logo .mk-slot { display: block; width: 30px; height: 30px; } .logo svg { display: block; width: 100%; height: 100%; transition: transform .5s var(--ease-in-out); }
-@media (hover: hover) and (pointer: fine) { .logo:hover svg { transform: rotate(45deg); } }
-.mk-slot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.logo .wordmark { display: block; width: auto; height: 26px; }
 .nav-right { display: flex; align-items: center; gap: 8px; }
 .lang-toggle { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .85); border: 1px solid var(--brand-100); box-shadow: 0 1px 2px rgba(26, 19, 16, .06); }
 .lang-toggle .thumb { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: var(--ink); transition: transform .22s var(--ease-out); }
@@ -101,13 +100,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 :root[lang="hi"] .frame-title { font-family: var(--f-deva); }
 .frame-chip { position: absolute; left: 0; right: 0; margin-inline: auto; width: max-content; bottom: 26px; opacity: 0; white-space: nowrap; background: #fff; border: 1px solid #F3DFC4; border-radius: 999px; padding: 6px 14px; font: 600 12px var(--f-body); color: #6B5545; }
 
-/* the Turn mark, split so its petals breathe and its centre turns on the beat */
+/* the Rupyon R (brand/rupyon-mark.png, never redrawn): it beats, lub-dub, and a halo breathes out on each beat */
 .mark { width: 120px; height: 120px; left: 120px; top: 240px; }
-.mark svg { width: 100%; height: 100%; overflow: visible; }
-.mark .petal { transform-box: fill-box; transform-origin: center; animation: petal var(--beat) var(--ease-in-out) infinite; }
-.mark .core { transform-box: view-box; transform-origin: 50px 50px; animation: core var(--beat) var(--ease-in-out) infinite; }
-@keyframes core { 0% { transform: rotate(0deg); } 50% { transform: rotate(45deg); } 100% { transform: rotate(90deg); } }
-@keyframes petal { 0%, 50%, 100% { transform: scale(1); } 22%, 72% { transform: scale(1.14); } }
+.mark img { position: relative; display: block; width: 100%; height: 100%; animation: beat var(--beat) var(--ease-out) infinite; }
+.mark::before { content: ""; position: absolute; inset: -18px; border-radius: 50%; background: radial-gradient(closest-side, rgba(249, 115, 22, .22), rgba(249, 115, 22, 0)); animation: halo var(--beat) var(--ease-out) infinite; }
+@keyframes beat { 0%, 56%, 100% { transform: scale(1); } 12% { transform: scale(1.09); } 26% { transform: scale(.99); } 38% { transform: scale(1.05); } }
+@keyframes halo { 0% { transform: scale(.8); opacity: 0; } 12% { opacity: 1; } 70%, 100% { transform: scale(1.5); opacity: 0; } }
 
 /* the orbit of words, turning slowly round the mark */
 .orbit { width: 300px; height: 300px; left: 30px; top: 150px; }
@@ -151,6 +149,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .scr .chip { position: absolute; left: 10%; right: 10%; bottom: 7%; height: 7%; border-radius: 999px; background: #fff; border: 1px solid #F3DFC4; font: 600 7.5px/1 var(--f-body); color: #6B5545; display: grid; place-items: center; white-space: nowrap; }
 
 /* beat 4 and 6: her hand, with the screen behind the thumb */
+.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .hand { opacity: 0; }
 .hand > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; z-index: 2; pointer-events: none; }
 .hand .scr { position: absolute; border-radius: 10%/5%; }
@@ -158,13 +157,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .hand1 .scr { left: 24.51%; top: 10.09%; width: 41.02%; height: 53.19%; }
 .hand2 { width: 405px; height: 608px; left: 12px; top: 113px; }
 .hand2 .scr { left: 13.18%; top: 6.97%; width: 56.74%; height: 66.99%; background: #fff; }
-.wd .hd { height: 24%; padding-top: 9%; font-size: 11px; }
-.wd .hd b { font-size: 30px; }
-.wd .mini { top: 34%; width: 38%; left: 31%; }
-.wd .go { position: absolute; left: 8%; right: 8%; top: 83%; height: 10%; border-radius: 999px; background: var(--brand-500); color: #fff; font: 600 13px/1 var(--f-body); display: flex; align-items: center; padding-left: 8%; }
-.wd .done { position: absolute; left: 9%; right: 4%; top: 68%; display: flex; align-items: center; gap: 8px; font: 600 12px var(--f-body); color: var(--ink); opacity: 0; }
-.wd .done i { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--brand-500); display: grid; place-items: center; }
-.tap { width: 44px; height: 44px; margin: -22px 0 0 -22px; left: 224px; top: 519px; border-radius: 50%; background: rgba(255, 255, 255, .7); opacity: 0; z-index: 3; }
+.tap { width: 44px; height: 44px; margin: -22px 0 0 -22px; left: 224px; top: 545px; border-radius: 50%; background: rgba(255, 255, 255, .7); opacity: 0; z-index: 3; }
 
 /* beat 5: her daughter with the fee slip, and the family's needs popping round her */
 .girl { width: 410px; height: 614px; left: -25px; top: 106px; opacity: 0; }
@@ -239,8 +232,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .seg button[aria-pressed="true"] { color: #fff; }
 .calc input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--brand-500); }
 .calc-out { position: relative; background: var(--card); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow: hidden; }
-.calc-out .mk { display: block; position: absolute; right: -36px; top: -36px; width: 140px; height: 140px; opacity: .12; }
-.calc-out .mk .core { transform-origin: 50px 50px; transition: transform .5s var(--ease-in-out); }
+.calc-out .mk { position: absolute; right: -28px; top: -28px; width: 128px; height: 128px; opacity: .1; }
+.calc-out .mk.bump { animation: bump .45s var(--ease-out); }
+@keyframes bump { 40% { transform: scale(1.08); } }
 .olabel { font-size: 14px; color: var(--ink-2); }
 .total { font: 600 44px/1.15 var(--f-head); color: var(--brand-800); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .osub { font-size: 15px; color: var(--ink-2); }
@@ -273,9 +267,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .start { position: relative; color: #fff; background: var(--card); overflow: hidden; }
 .start .bg { position: absolute; inset: 0; background: var(--brand-500); clip-path: circle(8% at 50% 60%); }
 .start .sec-in { position: relative; align-items: center; text-align: center; }
-.start .mark-big { display: block; width: 96px; height: 96px; }
-.start .mark-big .petal { transform-box: fill-box; transform-origin: center; animation: petal var(--beat) var(--ease-in-out) infinite; }
-.start .mark-big .core { transform-origin: 50px 50px; animation: core var(--beat) var(--ease-in-out) infinite; }
+.start .mark-big { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%; background: #fff; box-shadow: 0 16px 32px -16px rgba(154, 52, 18, .6); }
+.start .mark-big img { width: 58px; height: 58px; animation: beat var(--beat) var(--ease-out) infinite; }
 .start h2 { font-size: 34px; line-height: 1.3; }
 .start .sub { color: #FFEDD5; font-size: 17px; }
 .start .btn { background: #fff; color: var(--brand-800); }
@@ -313,7 +306,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
 @media (max-width: 899px) { .frame-title { display: none; } }
 /* fewer, gentler: the beats stop, words and sections fade instead of rising, the scroll is the browser's own */
 @media (prefers-reduced-motion: reduce) {
-  .mark .petal, .mark .core, .start .mark-big .petal, .start .mark-big .core, .orbit svg, .pulse i, .track, .hint svg { animation: none; }
+  .mark img, .mark::before, .start .mark-big img, .calc-out .mk.bump, .orbit svg, .pulse i, .track, .hint svg { animation: none; }
   .pulse i { opacity: .25; transform: scale(.9); }
   .rise .w > span { transform: none; opacity: 0; transition: opacity .4s ease; }
   .rise.show .w > span { opacity: 1; }
@@ -329,7 +322,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
 
 
 <nav class="nav" aria-label="Rupyon">
-  <a class="logo" href="#top"><span class="mk-slot" data-mark="#F97316"></span>Rupyon</a>
+  <a class="logo" href="#top"><img class="wordmark" src="brand/rupyon-wordmark-orange.png" alt="Rupyon"></a>
   <div class="nav-right">
     <div class="lang-toggle" role="group" aria-label="Language" data-on="en"><span class="thumb" aria-hidden="true"></span><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिंदी</button></div>
     <a class="btn sm nav-cta" href="#start"><span data-t="cta">Start With ₹100</span><span class="arr" aria-hidden="true">→</span></a>
@@ -349,7 +342,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
             <div class="orbit" id="orbit" aria-hidden="true"><svg viewBox="0 0 300 300"><defs><path id="orbit-path" d="M150 150 m-128 0 a128 128 0 1 1 256 0 a128 128 0 1 1 -256 0"/></defs>
               <circle class="ring" cx="150" cy="150" r="104"/><circle class="ring" cx="150" cy="150" r="146" stroke-dasharray="2 6"/><text><textPath href="#orbit-path" id="orbit-text"></textPath></text></svg></div>
             <div class="pulse" id="pulse" style="left:180px;top:300px" aria-hidden="true"><i></i><i></i><i></i></div>
-            <div class="mark mk-slot" id="mark" data-mark="#F97316"></div>
+            <div class="mark" id="mark"><img src="brand/rupyon-mark.png" alt=""></div>
 
             <div class="pill" id="pill"></div>
             <div class="shadow" id="shadow"></div>
@@ -360,19 +353,14 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
             </div>
             <div class="day" id="day"><b data-s="day">DAY</b><span id="day-n">1</span></div>
 
-            <div class="phone" id="phone"><div class="scr"><div id="phone-scr" style="position:absolute;inset:0"></div></div></div>
-            <div class="hand hand1" id="hand1"><div class="scr" id="hand1-scr"></div><img src="assets/dabba/hand-phone-hold-woman-screen.png" alt=""></div>
+            <div class="phone" id="phone"><div class="scr"><div id="phone-scr" style="position:absolute;inset:0"><img class="shot" src="assets/screens/sip-setup.jpg" alt=""></div></div></div>
+            <div class="hand hand1" id="hand1"><div class="scr" id="hand1-scr"><img class="shot" src="assets/screens/sips.jpg" alt=""></div><img src="assets/dabba/hand-phone-hold-woman-screen.png" alt=""></div>
 
             <div class="girl" id="girl"><img src="assets/dabba/dabba-daughter-slip.png" alt=""><span class="fee">₹1,500</span></div>
             <div id="needs"></div>
 
             <div class="burst" id="burst"><svg viewBox="0 0 420 420" id="burst-svg"></svg></div>
-            <div class="hand hand2" id="hand2"><div class="scr wd" id="wd">
-              <div class="hd"><span data-s="withdraw">Withdraw</span><b>₹1,500</b></div>
-              <div class="mini" id="wd-tin"><img class="body" src="assets/dabba/dabba-tin-body.png" alt=""><img class="lid" id="wd-lid" src="assets/dabba/dabba-tin-lid-orange.png" alt=""></div>
-              <div class="done" id="wd-done"><i><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span data-s="onWay">On its way to your bank</span></div>
-              <div class="go" id="wd-go" data-s="withdrawAmt">Withdraw ₹1,500</div>
-            </div><img src="assets/dabba/hand-phone-thumb-woman-screen.png" alt=""></div>
+            <div class="hand hand2" id="hand2"><div class="scr" id="wd"><img class="shot" src="assets/screens/redeem.jpg" alt=""><img class="shot" id="wd-credited" src="assets/screens/redeem-done.jpg" alt="" style="opacity:0"></div><img src="assets/dabba/hand-phone-thumb-woman-screen.png" alt=""></div>
             <div class="tap" id="tap"></div>
             <div class="slip" id="slip"><b></b><i></i><i></i><span>₹1,500</span></div>
             <div class="paid" id="paid"><svg width="14" height="14" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -414,7 +402,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
           <div class="field"><label class="flabel" for="c-dur"><span data-t="cDur">For how long</span><b id="c-dur-v">1 year</b></label><input type="range" id="c-dur" min="1" max="60" step="1" value="12"></div>
         </div>
         <div class="calc-out" aria-live="polite">
-          <span class="mk mk-slot" data-mark="#F97316" data-core="calc-core"></span>
+          <img class="mk" id="calc-mk" src="brand/rupyon-mark.png" alt="">
           <span class="olabel" data-t="cOut">You’ll have put aside</span>
           <b class="total" id="c-total">₹36,500</b>
           <span class="osub" id="c-sub">365 payments of ₹100</span>
@@ -446,7 +434,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
   <section class="sec start" id="start" aria-labelledby="start-h">
     <div class="bg" id="start-bg"></div>
     <div class="sec-in">
-      <span class="mark-big mk-slot" data-mark="#fff"></span>
+      <span class="mark-big" aria-hidden="true"><img src="brand/rupyon-mark.png" alt=""></span>
       <h2 class="rise" id="start-h" data-t="sTitle" data-rise>Start with ₹100.</h2>
       <p class="sub" data-t="sSub">Set it once, and it saves on its own.</p>
       <a class="btn" href="#start"><span data-t="cta">Start With ₹100</span><span class="arr" aria-hidden="true">→</span></a>
@@ -456,7 +444,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
 </main>
 
 <footer>
-  <a class="logo" href="#top"><span class="mk-slot" data-mark="#F97316"></span>Rupyon</a>
+  <a class="logo" href="#top"><img class="wordmark" src="brand/rupyon-wordmark-orange.png" alt="Rupyon"></a>
   <p><span data-t="support">Support 24/7</span> · <span data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</span></p>
 </footer>
 
@@ -466,13 +454,6 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 <script>
 const ART = "assets/dabba/";
-/* the Turn mark from brand/turn-mark.svg, drawn inline so its eight petals and its centre can move on their own */
-const PETALS = ["M89.6 50L79.4 60.2L79.4 39.8Z", "M78 78L63.58 78L78 63.58Z", "M50 89.6L39.8 79.4L60.2 79.4Z", "M22 78L22 63.58L36.42 78Z", "M10.4 50L20.6 39.8L20.6 60.2Z", "M22 22L36.42 22L22 36.42Z", "M50 10.4L60.2 20.6L39.8 20.6Z", "M78 22L78 36.42L63.58 22Z"];
-const CORE = "M62.93 55.36L54.95 54.95L55.36 62.93L50 57L44.64 62.93L45.05 54.95L37.07 55.36L43 50L37.07 44.64L45.05 45.05L44.64 37.07L50 43L55.36 37.07L54.95 45.05L62.93 44.64L57 50Z";
-document.querySelectorAll(".mk-slot").forEach(el => {
-  const f = el.dataset.mark, id = el.dataset.core ? ` id="${el.dataset.core}"` : "";
-  el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true">${PETALS.map(d => `<path class="petal" fill="${f}" d="${d}"/>`).join("")}<g class="core"${id}><path fill="${f}" d="${CORE}"/></g></svg>`;
-});
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = id => document.getElementById(id);
 gsap.registerPlugin(ScrollTrigger);
@@ -533,9 +514,6 @@ function riseText(el, text) {
 }
 
 /* ---------- the scene's fixed parts ---------- */
-function homeScreen(el) {
-  el.innerHTML = `<div class="hd">Rupyon<b>₹100</b></div><div class="mini"><img class="body" src="${ART}dabba-tin-body.png" alt=""><img class="lid" src="${ART}dabba-tin-lid-orange.png" alt=""></div><div class="chip">${SCENE[lang].autopay}</div>`;
-}
 const NOTE_X = [-22, -6, 10, 24], NOTE_R = [-10, -3, 4, 11];
 $("notes").innerHTML = NOTE_X.map((x, i) => `<img src="${ART}dabba-note-rolled.png" alt="" style="transform:translate(${x}px,-40px) rotate(${NOTE_R[i]}deg)">`).join("");
 const NEEDS = [["need-school-bag", 52, 210], ["need-gas-cylinder", 300, 200], ["need-medicine", 34, 360], ["need-festive-clothes", 318, 350], ["need-bicycle", 70, 500], ["need-sewing-machine", 292, 500]];
@@ -604,16 +582,13 @@ tl.to("#lid", { y: 0, x: 0, rotation: 0, duration: span(2, 0, .12) }, at(2, 0))
   .fromTo("#girl", { opacity: 0, y: 70, scale: .96 }, { opacity: 1, y: 0, scale: 1, ease: out, duration: span(4, .16, .46) }, at(4, .16));
 gsap.utils.toArray("#needs .need").forEach((n, i) => tl.fromTo(n, { opacity: 0, scale: .9, x: (180 - parseFloat(n.style.left) - 32) * .35, y: (330 - parseFloat(n.style.top) - 32) * .35 },
   { opacity: 1, scale: 1, x: 0, y: 0, ease: out, duration: span(4, 0, .22) }, at(4, .4 + i * .08)));
-/* 6 she takes it out: her thumb on Withdraw, a tap, the tin opens, a burst, the slip is paid; the scene pulls back into a card */
+/* 6 she takes it out: her thumb on Continue, a tap, Money credited, a burst, the slip is paid; the scene pulls back into a card */
 tl.to("#girl", { opacity: 0, y: 40, duration: span(5, 0, .12) }, at(5, 0))
   .to("#needs .need", { opacity: 0, scale: .92, duration: span(5, 0, .1) }, at(5, 0))
   .fromTo("#hand2", { opacity: 1, y: 600 }, { opacity: 1, y: 0, ease: out, duration: span(5, .04, .28), immediateRender: false }, at(5, .04))
   .fromTo("#tap", { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, ease: out, duration: span(5, .3, .35) }, at(5, .3))
   .to("#tap", { opacity: 0, scale: 1.5, ease: out, duration: span(5, .35, .42) }, at(5, .35))
-  .to("#wd-go", { scale: .96, duration: span(5, .3, .34) }, at(5, .3))
-  .to("#wd-go", { scale: 1, opacity: 0, duration: span(5, .36, .44) }, at(5, .36))
-  .to("#wd-lid", { y: -26, x: -14, rotation: -12, duration: span(5, .34, .46) }, at(5, .34))
-  .fromTo("#wd-done", { opacity: 0, y: 8 }, { opacity: 1, y: 0, ease: out, duration: span(5, .42, .5) }, at(5, .42))
+  .fromTo("#wd-credited", { opacity: 0 }, { opacity: 1, duration: span(5, .38, .48) }, at(5, .38))
   .fromTo("#burst", { opacity: 0, scale: .55, rotation: -10 }, { opacity: 1, scale: 1, rotation: 0, ease: out, duration: span(5, .44, .58) }, at(5, .44))
   .to("#burst", { opacity: 0, scale: 1.12, duration: span(5, .58, .7) }, at(5, .58))
   .fromTo("#slip", { opacity: 0, x: 40, y: -20, rotation: 12 }, { opacity: 1, x: 0, y: 0, rotation: 4, ease: out, duration: span(5, .46, .6) }, at(5, .46))
@@ -703,7 +678,7 @@ $("marquee").innerHTML = row(LANGS) + row([...LANGS].reverse(), true);
 /* ---------- savings calculator: only what she puts in, never returns. The total rolls to its new value ---------- */
 const RANGE = { daily: [100, 1000, 50], weekly: [100, 5000, 100], monthly: [100, 20000, 100] };
 const amt = $("c-amt"), dur = $("c-dur"), segs = document.querySelectorAll(".seg button");
-let freq = "daily", shown = 36500, turns = 0;
+let freq = "daily", shown = 36500;
 const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
 const roll = { v: shown };
 function durText(m) {
@@ -719,7 +694,7 @@ function updateCalc(animate = true) {
   $("c-sub").textContent = lang === "hi" ? `${inr(a)} की ${n.toLocaleString("en-IN")} ${n === 1 ? "किस्त" : "किस्तें"}` : `${n.toLocaleString("en-IN")} ${n === 1 ? "payment" : "payments"} of ${inr(a)}`;
   gsap.killTweensOf(roll); // retarget from wherever it is now
   gsap.to(roll, { v: total, duration: animate && !reduce ? .35 : 0, ease: "power3.out", onUpdate: () => { $("c-total").textContent = inr(roll.v); } });
-  if (total !== shown && !reduce) { turns += total > shown ? 1 : -1; $("calc-core").style.transform = `rotate(${turns * 45}deg)`; }
+  if (total !== shown && !reduce) { const mk = $("calc-mk"); mk.classList.remove("bump"); void mk.offsetWidth; mk.classList.add("bump"); }
   shown = total;
 }
 segs.forEach((b, i) => b.addEventListener("click", () => { freq = b.dataset.f; segs.forEach(x => x.setAttribute("aria-pressed", String(x === b))); b.parentElement.style.setProperty("--at", i); updateCalc(); }));
@@ -732,7 +707,6 @@ function applyLang(l) {
   document.querySelectorAll("[data-t]").forEach(el => { const t = STR[l][el.dataset.t]; if (el.matches("[data-rise]")) { riseText(el, t); } else el.textContent = t; });
   document.querySelectorAll("[data-s]").forEach(el => { el.textContent = SCENE[l][el.dataset.s]; });
   $("orbit-text").textContent = SCENE[l].orbit.join("  ·  ") + "  ·";
-  homeScreen($("phone-scr")); homeScreen($("hand1-scr"));
   toggles.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
   renderMoments(); updateCalc(false); setBeat(Math.max(cur, 0), true);
   try { localStorage.setItem("rupyon-lang", l); } catch (e) {}

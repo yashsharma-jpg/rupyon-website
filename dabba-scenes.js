@@ -1,8 +1,9 @@
 /* Scene drawing for the Maa hai na opener (round 3), shared by boards/storyboards.html and prototype/index.html.
    Every scene is SVG markup in a 360 x 640 box. Set window.DABBA_ASSETS (the PNG folder, ending in /) and
-   window.TURN_MARK (a copy of public/brand/turn-mark.svg) before loading this file. */
+   window.TURN_MARK (the Rupyon mark, the ribbon R) before loading this file. Phone screens are the real Rupyon app screens
+   in window.RUPYON_SCREENS (default assets/screens/), captured from the handoff build with the numbers set to this story. */
 (function () {
-  const IMG = window.DABBA_ASSETS || "assets/dabba/", TURN = window.TURN_MARK || "brand/turn-mark.svg";
+  const IMG = window.DABBA_ASSETS || "assets/dabba/", TURN = window.TURN_MARK || "brand/rupyon-mark.png", SHOTS = window.RUPYON_SCREENS || "assets/screens/";
   const E = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
   const C = t => Math.min(1, Math.max(0, t));
   const L = (a, b, t) => a + (b - a) * t;
@@ -82,8 +83,10 @@
   }
   function phone(cx, top, w, h, screen, bg = CREAM) {
     const x = cx - w / 2, rx = w * 0.15;
+    const id = "ph" + (++CID);
     return `<rect x="${x}" y="${top}" width="${w}" height="${h}" rx="${rx}" fill="${INK}"/><rect x="${x + 6}" y="${top + 6}" width="${w - 12}" height="${h - 12}" rx="${rx - 5}" fill="${bg}"/>
-      <rect x="${cx - w * 0.13}" y="${top + 12}" width="${w * 0.26}" height="${Math.max(5, w * 0.045)}" rx="4" fill="${INK}"/>${screen(x + 6, top + 6, w - 12, h - 12)}`;
+      <clipPath id="${id}"><rect x="${x + 6}" y="${top + 6}" width="${w - 12}" height="${h - 12}" rx="${rx - 5}"/></clipPath><g clip-path="url(#${id})">${screen(x + 6, top + 6, w - 12, h - 12)}</g>
+      <rect x="${cx - w * 0.13}" y="${top + 12}" width="${w * 0.26}" height="${Math.max(5, w * 0.045)}" rx="4" fill="${INK}"/>`;
   }
   function header(sx, sy, sw, sh, label = "Rupyon") {
     const hh = sh * 0.26, r = sw * 0.12;
@@ -94,6 +97,8 @@
       return header(sx, sy, sw, sh) + num(cx, sy + sh * 0.2, sw * 0.14, "#fff", "₹100") + tinImg({ cx, base: sy + sh * 0.74, w: sw * 0.46, orange: 1, shadow: false })
         + `<rect x="${sx + sw * 0.12}" y="${sy + sh * 0.84}" width="${sw * 0.76}" height="${sh * 0.07}" rx="${sh * 0.035}" fill="#fff" stroke="#F3DFC4"/>` + ui(cx, sy + sh * 0.885, sw * 0.062, "#6B5545", tr("autopay")); };
   }
+  /* a real app screen, filling the phone from the top */
+  const shot = (name, op = 1) => (sx, sy, sw, sh) => op <= 0 ? "" : `<image href="${SHOTS}${name}.jpg" x="${sx}" y="${sy}" width="${sw}" height="${sh}" preserveAspectRatio="xMidYMin slice"${op < 1 ? ` opacity="${op}"` : ""}/>`;
   function rings(cx, cy, p, r0 = 120) { let s = ""; for (let i = 0; i < 3; i++) { const q = (p * 1.6 + i / 3) % 1; s += `<circle cx="${cx}" cy="${cy}" r="${r0 + q * 70}" fill="none" stroke="${ORANGE}" stroke-width="2" opacity="${(1 - q) * 0.45}"/>`; } return s; }
   function pills(p) {
     const rows = tr("pills");
@@ -129,6 +134,10 @@
   }
   /* Withdraw screen, laid out round the thumb: the button sits under the thumb tip, and the status line lands above it */
   function withdrawScreen(p) {
+    const done = C((p - 0.26) / 0.1);
+    return (sx, sy, sw, sh) => shot("redeem")(sx, sy, sw, sh) + shot("redeem-done", done)(sx, sy, sw, sh);
+  }
+  function drawnWithdrawScreen(p) {
     const press = C((p - 0.1) / 0.08) * (1 - C((p - 0.24) / 0.06)), done = C((p - 0.26) / 0.1), open = E(C((p - 0.26) / 0.12)) * (1 - E(C((p - 0.6) / 0.1)));
     return (sx, sy, sw, sh) => { const cx = sx + sw / 2, by = sy + sh * 0.83;
       let s = header(sx, sy, sw, sh * 0.92, tr("withdraw")) + num(cx, sy + sh * 0.18, sw * 0.15, "#fff", "₹1,500");
@@ -143,7 +152,7 @@
   const NOTE_X = [-22, -7, 8, 22], NOTE_R = [-10, -3, 4, 11];
   const beats = [
     /* 1 Hero */
-    p => pills(p) + `<ellipse cx="180" cy="470" rx="80" ry="8" fill="${INK}" opacity=".1"/>` + phone(180, 140, 150, 320, home()),
+    p => pills(p) + `<ellipse cx="180" cy="470" rx="80" ry="8" fill="${INK}" opacity=".1"/>` + phone(180, 140, 150, 320, shot("welcome")),
     /* 2 Days add up */
     p => { const up = E(C(p / 0.25)), lift = E(C((p - 0.18) / 0.15)); let ins = "";
       NOTE_X.forEach((dx, i) => { const f = E(C((p - 0.32 - i * 0.12) / 0.14)); if (f > 0) ins += rnote(180 + dx, L(40, 344, f), 72, NOTE_R[i] * f); });
@@ -151,11 +160,11 @@
       return wall() + shelf() + `<g opacity="${C(p * 4)}" transform="translate(0 ${L(70, 0, up)})">` + tinImg({ lid: 90 * lift, lidX: -64 * lift, lidRot: -14 * lift, inside: ins }) + `</g>` + dayTile(day, C((p - 0.22) * 6)); },
     /* 3 Into the phone */
     p => { const drop = 1 - E(C(p / 0.18)), orange = C((p - 0.18) / 0.18), rise = E(p * 1.6), sink = E((p - 0.25) * 1.6), fade = 1 - C(p * 2.2), show = C((p - 0.6) * 3);
-      return wall(fade) + shelf(fade) + phone(180, L(660, 150, rise), 150, 320, (sx, sy, sw, sh) => show > 0 ? `<g opacity="${show}">${header(sx, sy, sw, sh)}${num(sx + sw / 2, sy + sh * 0.2, sw * 0.14, "#fff", "₹100")}</g>` : "")
-        + tinImg({ cx: 180, base: L(SHELF_BASE, 156 + 308 * 0.74, sink), w: L(124, 138 * 0.46, sink), orange, shadow: sink < 0.5, lid: 90 * drop, lidX: -64 * drop, lidRot: -14 * drop }); },
+      return wall(fade) + shelf(fade) + phone(180, L(660, 150, rise), 150, 320, shot("sip-setup", show))
+        + `<g opacity="${1 - show}">` + tinImg({ cx: 180, base: L(SHELF_BASE, 156 + 308 * 0.74, sink), w: L(124, 138 * 0.46, sink), orange, shadow: sink < 0.5, lid: 90 * drop, lidX: -64 * drop, lidRot: -14 * drop }) + `</g>`; },
     /* 4 In her hand */
     p => { const z = L(1.12, 1, E(p));
-      return `<g transform="translate(180 330) scale(${z}) translate(-180 -330)">` + wall() + shelf(1, false) + tinImg({ cx: 66, w: 64 }) + rings(225, 333, p) + handPhone("hold", 140, 168, 170, home()) + `</g>`; },
+      return `<g transform="translate(180 330) scale(${z}) translate(-180 -330)">` + wall() + shelf(1, false) + tinImg({ cx: 66, w: 64 }) + rings(225, 333, p) + handPhone("hold", 140, 168, 170, shot("sips")) + `</g>`; },
     /* 5 The need */
     p => { const up = E(C(p / 0.35)), pop = 1 + 0.04 * Math.sin(Math.PI * C((p - 0.35) / 0.2));
       return `<circle cx="180" cy="400" r="${L(130, 180, up)}" fill="${CREAM}"/><g transform="translate(0 ${L(70, 0, up)})"><g transform="translate(180 505) scale(${pop}) translate(-180 -505)">` + girl("₹1,500") + `</g></g>`; },
@@ -164,11 +173,11 @@
       const press = C((p - 0.1) / 0.08) * (1 - C((p - 0.24) / 0.06)), [tx, ty] = handTip("thumb", 65, 156, 230);
       const card = shrink > 0 ? `<g opacity="${shrink}"><rect x="34" y="84" width="292" height="490" rx="28" fill="#FED7AA"/>` + ui(56, 122, 16, INK, tr("cardTitle"), "start") + ui(56, 143, 11.5, "#8A7666", tr("cardSub"), "start", 500) + `</g>` : "";
       const note = fly > 0 && fly < 1 ? fnote(L(180, 290, fly), L(330, 166, fly) - 60 * Math.sin(Math.PI * fly), L(44, 24, fly), L(0, 28, fly)) : "";
-      const ripple = press > 0 ? `<circle cx="${tx}" cy="${ty}" r="${L(4, 22, press)}" fill="#fff" opacity="${0.5 * press}"/>` : "";
+      const ripple = press > 0 ? `<circle cx="${tx}" cy="${ty + 22}" r="${L(4, 22, press)}" fill="#fff" opacity="${0.5 * press}"/>` : "";
       return card + `<g transform="translate(180 ${L(330, 450, shrink)}) scale(${s}) translate(-180 -330)">` + handPhone("thumb", 65, 156, 230, withdrawScreen(p), "#fff") + ripple + `</g>`
         + (slipOp > 0 ? `<g opacity="${slipOp}">` + flare(306, 176, C((p - 0.56) / 0.22)) + slip(250, 96, 74, "₹1,500", tick) + `</g>` : "") + note; },
     /* 7 Everywhere */
-    p => tokens(E(p * 2)) + phone(180, 200, 120, 256, home()),
+    p => tokens(E(p * 2)) + phone(180, 200, 120, 256, shot("language")),
   ];
 
   const FILES = ["dabba-kitchen-wall", "dabba-shelf", "dabba-tin-body", "dabba-tin-lid-steel", "dabba-tin-lid-orange", "dabba-note-rolled", "dabba-note-flat", "dabba-jar-left", "dabba-jar-right",

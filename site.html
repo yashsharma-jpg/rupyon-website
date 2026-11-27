@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rupyon · Maa hai na</title>
+<link rel="icon" href="brand/rupyon-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600&family=Noto+Sans+Bengali:wght@600&family=Noto+Sans+Gujarati:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&family=Noto+Sans+Kannada:wght@600&display=swap">
@@ -39,7 +40,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 .nav { position: fixed; z-index: 20; inset: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--gutter) 12px; pointer-events: none; }
 .nav > * { pointer-events: auto; }
 .logo { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 600 22px var(--f-head); letter-spacing: -0.02em; }
-.logo img { width: 30px; height: 30px; }
+.logo .wordmark { display: block; width: auto; height: 26px; }
 .nav-right { display: flex; align-items: center; gap: 8px; }
 .lang-toggle { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .85); border: 1px solid var(--brand-100); box-shadow: 0 1px 2px rgba(26, 19, 16, .06); }
 .lang-toggle button { height: 30px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 13px var(--f-body); cursor: pointer; transition: background .15s, color .15s; }
@@ -169,7 +170,7 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
 <body>
 
 <nav class="nav" aria-label="Rupyon">
-  <a class="logo" href="#top"><img src="brand/turn-mark.svg" alt="">Rupyon</a>
+  <a class="logo" href="#top"><img class="wordmark" src="brand/rupyon-wordmark-orange.png" alt="Rupyon"></a>
   <div class="nav-right">
     <div class="lang-toggle" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिंदी</button></div>
     <a class="btn sm nav-cta" href="#start" data-t="cta">Start With ₹100</a>
@@ -252,11 +253,11 @@ footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64p
 </main>
 
 <footer>
-  <a class="logo" href="#top"><img src="brand/turn-mark.svg" alt="">Rupyon</a>
+  <a class="logo" href="#top"><img class="wordmark" src="brand/rupyon-wordmark-orange.png" alt="Rupyon"></a>
   <p><span data-t="support">Support 24/7</span> · <span data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</span></p>
 </footer>
 
-<script>window.DABBA_ASSETS = "assets/dabba/"; window.TURN_MARK = "brand/turn-mark.svg";</script>
+<script>window.DABBA_ASSETS = "assets/dabba/"; window.TURN_MARK = "brand/rupyon-mark.png";</script>
 <script src="dabba-scenes.js"></script>
 <script src="variant.js"></script>
 <script>
