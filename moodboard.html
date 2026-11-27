@@ -14,7 +14,7 @@
    Scrolling moves a camera over paper sheets taped to a gridded table. Under reduced motion the sheets stack and nothing moves. */
 :root {
   --canvas: #FDF5E9; --card: #FFFFFF; --ink: #1A1310; --ink-2: #5B4A3F; --ink-3: #8A7666;
-  --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412; --success-50: #ECFDF3; --success-200: #ABEFC6; --success-600: #079455; --success-700: #067647;
+  --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-300: #FDBA74; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412; --success-50: #ECFDF3; --success-200: #ABEFC6; --success-600: #079455; --success-700: #067647;
   --f-head: "Anek Latin", "Inter", system-ui, sans-serif;
   --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-deva: "Noto Sans Devanagari", "Noto Sans", "Inter", system-ui, sans-serif;
@@ -119,10 +119,34 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); out
 #rhythm .fine { border-top-color: var(--success-200); }
 #rhythm .calc-out .mk { filter: grayscale(1) sepia(1) hue-rotate(75deg) saturate(2.2); }
 
-.trust { display: grid; gap: 12px; }
-.tcard { background: var(--card); border: 1px solid var(--brand-100); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
-.tcard b { font: 600 18px var(--f-head); }
-.tcard p { font-size: 15px; color: var(--ink-2); }
+/* trust: four protection cards from the app's Home screen. A snap carousel under 900px, a 2x2 grid above */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.prot { display: flex; flex-direction: column; gap: 8px; }
+.prot-track { display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); margin-inline: calc(var(--gutter) * -1); padding: 8px var(--gutter) 4px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.prot-track::-webkit-scrollbar { display: none; }
+.prot-track:focus-visible { outline: 2px solid var(--brand-500); outline-offset: -2px; border-radius: 16px; }
+.pcard { position: relative; flex: 0 0 min(340px, 100%); height: 220px; scroll-snap-align: start; overflow: hidden; border-radius: 16px; border: 1px solid var(--brand-300); background: var(--card); }
+.pcard-t { position: absolute; top: 23px; left: 23px; width: min(260px, calc(100% - 46px)); display: flex; flex-direction: column; gap: 8px; }
+.pcard h3 { font: 600 24px/32px var(--f-head); letter-spacing: -0.01em; text-wrap: wrap; color: var(--ink); }
+.pcard p { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink-2); }
+:root[lang="hi"] .pcard h3 { font-family: var(--f-deva); font-size: 22px; line-height: 30px; letter-spacing: 0; }
+:root[lang="hi"] .pcard p { line-height: 22px; }
+.pcard-i { position: absolute; top: var(--t); right: var(--r); width: var(--w); height: var(--h); pointer-events: none; }
+.pcard-i img { display: block; width: 100%; height: auto; max-width: none; }
+.pcard-i.crop { overflow: hidden; }
+.pcard-i.crop img { position: absolute; top: 0; left: -76.8%; width: 177.03%; }
+.pcard-i.flip { transform: scaleX(-1); }
+.pcard-n { position: absolute; top: -7px; right: -4px; display: flex; align-items: center; justify-content: center; width: 57px; height: 55px; padding-top: 5px; border-radius: 8px; background: linear-gradient(to bottom, var(--brand-600), var(--brand-100)); color: #fff; font: 600 32px/40px var(--f-head); letter-spacing: -0.01em; }
+.prot-dots { display: flex; justify-content: center; gap: 2px; }
+.prot-dots button { display: flex; align-items: center; height: 32px; padding: 0 5px; border: 0; background: none; cursor: pointer; }
+.prot-dots button:focus-visible { outline: 2px solid var(--brand-500); outline-offset: -2px; border-radius: 4px; }
+.pb { display: block; width: 24px; height: 4px; border-radius: 2px; background: var(--brand-300); overflow: hidden; }
+.pb i { display: block; width: 100%; height: 100%; background: var(--brand-600); transform: scaleX(0); transform-origin: 0 50%; }
+.prot-dots .done i, .prot-dots .cur i { transform: none; }
+.prot-dots .run i { animation: pfill 4s linear both; }
+@keyframes pfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.prot.rv .pcard { opacity: 0; transform: translateY(18px); transition: opacity .6s cubic-bezier(.22, 1, .36, 1), transform .6s cubic-bezier(.22, 1, .36, 1); transition-delay: calc(var(--k) * 70ms); }
+.prot.rv.in .pcard { opacity: 1; transform: none; }
 
 .langs { display: flex; flex-wrap: wrap; gap: 10px; }
 .lang { background: var(--card); border: 1px solid var(--brand-100); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 17px; }
@@ -147,7 +171,10 @@ footer { padding: 120px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64
   .sec { padding-block: 112px; padding-left: var(--gutter); padding-right: var(--gutter); }
   .sec-head h2 { font-size: 40px; }
   .moments { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; overflow: visible; margin-inline: 0; padding-inline: 0; }
-  .trust { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .prot-track { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; overflow: visible; scroll-snap-type: none; margin-inline: 0; padding: 8px 0 0; }
+  .pcard { flex: none; }
+  .pcard-t { width: min(340px, calc(100% - 46px)); }
+  .prot-dots { display: none; }
   .calc { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; padding: 28px; }
   .calc-out { justify-content: center; padding: 28px; }
   .total { font-size: 56px; }
@@ -158,7 +185,7 @@ u { text-decoration: none; }
 
 :root { --ground: #e1d5bd; --paper: #fff5e1; --paper-shadow: 0 1px 2px #51361e26, 0 6px 18px -7px #51361e5c;
   --f-serif: var(--f-head); --f-serif-hi: var(--f-deva); } /* the sheets use the app's heading fonts too */
-html { scroll-padding-top: 0; }
+html { scroll-padding-top: 64px; } /* the fixed masthead's height, so anchor jumps land below it */
 
 /* masthead and chapter bar (fixed) */
 .masthead, .controls { position: fixed; z-index: 25; inset-inline: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 var(--gutter); background: #f9f2e5; }
@@ -169,7 +196,7 @@ html { scroll-padding-top: 0; }
 .moving .play { display: inline-block; }
 :root[lang="hi"] .play, :root[lang="hi"] .controls { font-family: var(--f-deva); }
 .play:hover { background: #fff; }
-.controls { bottom: 0; min-height: 64px; border-top: 1px solid #bcae98; transition: opacity .3s ease, transform .3s ease; }
+.controls { bottom: 0; min-height: 64px; border-top: 1px solid #bcae98; transition: opacity .25s cubic-bezier(0.23, 1, 0.32, 1), transform .25s cubic-bezier(0.23, 1, 0.32, 1); }
 .controls.off { opacity: 0; transform: translateY(100%); pointer-events: none; }
 .cue { font-size: 14px; color: #675743; }
 .controls nav { display: flex; gap: 4px; }
@@ -237,14 +264,22 @@ html { scroll-padding-top: 0; }
 
 body:not(.moving) .board { display: grid; gap: 4rem; justify-items: center; padding: 110px 0; }
 body:not(.moving) .sheet { scroll-margin-top: 90px; }
+body:not(.moving) .board { position: relative; padding-bottom: 300px; }
+body:not(.moving) .board::after { content: ""; position: absolute; inset: auto 0 0; height: 300px; pointer-events: none; background: linear-gradient(transparent, var(--canvas)); } /* the stacked tabletop dissolves into the canvas, no edge */
+.shot2 { display: none; }
+body:not(.moving) .pay .hand { left: calc(17cqw - 42cqh); }
+body:not(.moving) .shot2 { display: block; position: absolute; z-index: 3; left: 34cqw; top: 14cqh; height: 44cqh; width: auto; border-radius: 12px; transform: rotate(5deg); box-shadow: var(--paper-shadow); }
 .moving .travel { position: relative; }
 .moving .viewport { position: sticky; top: 0; height: 100svh; overflow: clip; }
 .moving .camera { position: absolute; top: 50%; left: 50%; }
 .moving .board { position: absolute; width: 1px; height: 1px; background: none; transform-origin: 0 0; will-change: transform; }
-.moving .board::before { content: ""; position: absolute; inset: -100vh -250vw -420vh -200vw; background-color: var(--ground); background-image: linear-gradient(#70523114 1px, transparent 1px), linear-gradient(90deg, #70523114 1px, transparent 1px); background-size: 28px 28px; }
+.moving .board::before { content: ""; opacity: calc(1 - var(--out, 0)); position: absolute; inset: -100vh -250vw -420vh -200vw; background-color: var(--ground); background-image: linear-gradient(#70523114 1px, transparent 1px), linear-gradient(90deg, #70523114 1px, transparent 1px); background-size: 28px 28px; }
 .moving .sheet { position: absolute; transform: translate(-50%, -50%) rotate(var(--tilt)); }
 
 @media (max-width: 660px) and (orientation: portrait) {
+ body:not(.moving) .pay .hand { left: calc(27cqw - 28.7cqh); }
+ body:not(.moving) .shot2 { left: auto; right: 5cqw; top: 8cqh; height: 30cqh; }
+ .moving .camera { top: calc(50% - 28px); } /* seat the sheet between the masthead and the version pill + chapter bar, so neither covers it at rest */
  .sheet { width: min(86vw, 55svh); height: min(126vw, 79svh); grid-template-columns: 1fr; grid-template-rows: 42% 58%; }
  .sheet .copy { padding: 6cqw 7cqw 3cqw; }
  .sheet .copy h1, .sheet .copy h2 { font-size: 11cqw; }
@@ -273,6 +308,7 @@ body:not(.moving) .sheet { scroll-margin-top: 90px; }
  .coda-art img { height: 84%; top: 8%; }
 }
 @media (max-width: 660px) {
+ html { scroll-padding-top: 52px; }
  .masthead { height: 52px; gap: 8px; }
  .masthead-right { gap: 6px; }
  .play { padding: 0 11px; height: 32px; font-size: 13px; }
@@ -285,6 +321,7 @@ body:not(.moving) .sheet { scroll-margin-top: 90px; }
 }
 @media (max-width: 380px) { .masthead .logo img { height: 22px; } .play { padding: 0 9px; font-size: 12px; } }
 @media (max-height: 520px) and (orientation: landscape) {
+ html { scroll-padding-top: 40px; }
  .masthead, .controls { min-height: 0; height: 40px; }
  .sheet { width: 125svh; height: 74svh; }
  .sheet .copy p { font-size: 1.9cqw; }
@@ -342,6 +379,7 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
       <div class="screens"><div class="track" id="track"><img src="assets/screens/redeem.jpg" alt="" width="780" height="1382"><img src="assets/screens/redeem-done.jpg" alt="" width="780" height="1382"></div></div>
       <img class="hole" src="assets/dabba/hand-phone-thumb-woman-v2-screen.png" alt="" width="1024" height="1536">
     </div>
+    <img class="shot2" src="assets/screens/redeem-done.jpg" alt="" width="780" height="1382">
   </div>
 </article>
 <article class="sheet bicycle" id="bicycle" aria-labelledby="bicycle-title">
@@ -387,11 +425,15 @@ body.hero-on .variant { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
 
   <section class="sec" id="yours" aria-labelledby="yours-h">
     <div class="sec-in">
-      <div class="sec-head"><span class="label" data-t="yLabel">Your money stays yours</span><h2 id="yours-h" data-t="yTitle">Your money, in your name.</h2><p class="sub" data-t="ySub">Every rupee is held in your name and comes back to your own bank.</p></div>
-      <div class="trust">
-        <div class="tcard"><b data-t="t1">In your name</b><p data-t="t1p">Every rupee you save is held in your own name.</p></div>
-        <div class="tcard"><b data-t="t2">Back to your bank</b><p data-t="t2p">When you take money out, it goes to your own bank account.</p></div>
-        <div class="tcard"><b data-t="t3">Help any time</b><p data-t="t3p">Support is open 24/7.</p></div>
+      <div class="sec-head"><span class="label" data-t="yLabel">Your money stays yours</span><h2 id="yours-h" data-t="yTitle">How are your funds protected?</h2></div>
+      <div class="prot" id="prot">
+        <div class="prot-track" id="prot-track" role="region" aria-labelledby="yours-h" tabindex="0">
+          <article class="pcard" style="--k:0"><div class="pcard-t"><h3 data-t="p1">SEBI regulated</h3><p data-t="p1b">Every fund on Rupyon follows the rules SEBI sets for mutual funds in India.</p></div><div class="pcard-i crop" style="--t:88px;--r:-1px;--w:111px;--h:131px" aria-hidden="true"><img src="assets/protect/protect-sebi.png" alt="" width="600" height="400" loading="lazy" decoding="async"></div><span class="pcard-n" aria-hidden="true">1</span></article>
+          <article class="pcard" style="--k:1"><div class="pcard-t"><h3 data-t="p2">We never hold your money</h3><p data-t="p2b">A separate SEBI-registered custodian holds it. Not Rupyon, not the fund house.</p></div><div class="pcard-i flip" style="--t:121px;--r:-20px;--w:114px;--h:114px" aria-hidden="true"><img src="assets/protect/protect-vault.png" alt="" width="400" height="400" loading="lazy" decoding="async"></div><span class="pcard-n" aria-hidden="true">2</span></article>
+          <article class="pcard" style="--k:2"><div class="pcard-t"><h3 data-t="p3">The units are in your name</h3><p data-t="p3b">Linked to your PAN and recorded with the registrar, not with us.</p></div><div class="pcard-i" style="--t:118px;--r:-6px;--w:122px;--h:122px" aria-hidden="true"><img src="assets/protect/protect-certificate.png" alt="" width="400" height="400" loading="lazy" decoding="async"></div><span class="pcard-n" aria-hidden="true">3</span></article>
+          <article class="pcard" style="--k:3"><div class="pcard-t"><h3 data-t="p4">Take out your money whenever you want</h3><p data-t="p4b">No lock-in. Pause, reduce or stop whenever you want.</p></div><div class="pcard-i" style="--t:115px;--r:-7px;--w:113px;--h:113px" aria-hidden="true"><img src="assets/protect/protect-padlock.png" alt="" width="400" height="400" loading="lazy" decoding="async"></div><span class="pcard-n" aria-hidden="true">4</span></article>
+        </div>
+        <div class="prot-dots" role="group" aria-labelledby="yours-h"><button type="button"><b class="pb"><i></i></b><span class="sr"><span data-t="pCard">Card</span> 1</span></button><button type="button"><b class="pb"><i></i></b><span class="sr"><span data-t="pCard">Card</span> 2</span></button><button type="button"><b class="pb"><i></i></b><span class="sr"><span data-t="pCard">Card</span> 3</span></button><button type="button"><b class="pb"><i></i></b><span class="sr"><span data-t="pCard">Card</span> 4</span></button></div>
       </div>
     </div>
   </section>
@@ -438,15 +480,15 @@ const STR = {
   en: { cta: "Start With ₹100", risk: RISK.en, support: "Support 24/7",
     mLabel: "Maa hai na", mTitle: "Money ready when it’s needed.", mSub: "Money she put aside days and months ago, there when the family needs it.",
     rLabel: "Your rhythm", rTitle: "Save the way you earn.", rSub: "Daily, weekly or monthly, from ₹100. See what it adds up to.", daily: "Daily", weekly: "Weekly", monthly: "Monthly", cHow: "How often", cAmt: "Amount each time", cDur: "For how long", cOut: "You’ll have put aside", cFine: "This counts only what you put in. The value of mutual funds can go up or down.", rNote: "Set it once with your UPI PIN. UPI AutoPay does the rest.",
-    yLabel: "Your money stays yours", yTitle: "Your money, in your name.", ySub: "Every rupee is held in your name and comes back to your own bank.",
-    t1: "In your name", t1p: "Every rupee you save is held in your own name.", t2: "Back to your bank", t2p: "When you take money out, it goes to your own bank account.", t3: "Help any time", t3p: "Support is open 24/7.",
+    yLabel: "Your money stays yours", yTitle: "How are your funds protected?", pCard: "Card",
+    p1: "SEBI regulated", p1b: "Every fund on Rupyon follows the rules SEBI sets for mutual funds in India.", p2: "We never hold your money", p2b: "A separate SEBI-registered custodian holds it. Not Rupyon, not the fund house.", p3: "The units are in your name", p3b: "Linked to your PAN and recorded with the registrar, not with us.", p4: "Take out your money whenever you want", p4b: "No lock-in. Pause, reduce or stop whenever you want.",
     lLabel: "Your language", lTitle: "In your own language.", lSub: "Hard words turn simple, in eight languages.",
     sTitle: "Start with ₹100.", sSub: "Set it once, and it saves on its own." },
   hi: { cta: "₹100 से शुरू करें", risk: RISK.hi, support: "सहायता 24/7",
     mLabel: "माँ है ना", mTitle: "जब ज़रूरत हो, पैसा तैयार।", mSub: "दिनों और महीनों पहले बचाया पैसा, परिवार की ज़रूरत पर हाज़िर।",
     rLabel: "आपकी रफ़्तार", rTitle: "जैसी कमाई, वैसी बचत।", rSub: "रोज़, हर हफ़्ते या हर महीने, ₹100 से। देखिए कितना जुड़ता है।", daily: "रोज़", weekly: "हर हफ़्ते", monthly: "हर महीने", cHow: "कितनी बार", cAmt: "हर बार कितना", cDur: "कितने समय तक", cOut: "आपकी कुल जमा", cFine: "यह सिर्फ़ आपकी जमा की गई रकम है। म्यूचुअल फंड की वैल्यू घट-बढ़ सकती है।", rNote: "एक बार UPI PIN से सेट करें। बाकी UPI AutoPay कर देगा।",
-    yLabel: "पैसा आपका ही रहता है", yTitle: "पैसा आपका, आपके नाम।", ySub: "हर रुपया आपके नाम पर, और वापस आपके अपने बैंक में।",
-    t1: "आपके नाम पर", t1p: "आपकी बचत का हर रुपया आपके अपने नाम पर रहता है।", t2: "बैंक में वापस", t2p: "पैसे निकालने पर वे सीधे आपके अपने बैंक खाते में जाते हैं।", t3: "हर समय मदद", t3p: "सहायता 24/7 उपलब्ध है।",
+    yLabel: "पैसा आपका ही रहता है", yTitle: "आपके फंड कैसे सुरक्षित हैं?", pCard: "कार्ड",
+    p1: "SEBI से नियंत्रित", p1b: "यहाँ हर फंड उन नियमों पर चलता है जो SEBI भारत में म्यूचुअल फंड के लिए तय करता है।", p2: "हम आपका पैसा कभी अपने पास नहीं रखते", p2b: "इसे SEBI में पंजीकृत एक अलग कस्टोडियन रखता है। न Rupyon, न फंड हाउस।", p3: "यूनिट आपके नाम पर हैं", p3b: "आपके PAN से जुड़ी हैं और रजिस्ट्रार के पास दर्ज हैं, हमारे पास नहीं।", p4: "जब चाहें अपना पैसा निकालें", p4b: "कोई लॉक-इन नहीं। जब चाहें रोकें, घटाएँ या बंद करें।",
     lLabel: "आपकी भाषा", lTitle: "अपनी भाषा में।", lSub: "मुश्किल शब्द आसान, आठ भाषाओं में।",
     sTitle: "₹100 से शुरू करें।", sSub: "एक बार सेट करें, बचत अपने आप होगी।" },
 };
@@ -525,6 +567,30 @@ function applyLang(l) {
 }
 toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
 
+/* ---------- trust cards: a snap carousel under 900px (autoplay every 4s, paused on touch, hover, focus and off-screen), a grid above ---------- */
+(() => {
+  const root = document.getElementById("prot"), track = document.getElementById("prot-track"); if (!root || !track) return;
+  const cards = [...track.children], dots = [...root.querySelectorAll(".prot-dots button")];
+  const wide = matchMedia("(min-width: 900px)"), calm = matchMedia("(prefers-reduced-motion: reduce)");
+  let idx = 0, timer = 0, lock = 0, held = false, shown = false;
+  const running = () => !wide.matches && !calm.matches && !held && shown && !document.hidden;
+  const mark = () => dots.forEach((d, i) => { d.classList.toggle("cur", i === idx); d.classList.toggle("done", i < idx); d.classList.toggle("run", i === idx && running()); if (i === idx) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current"); });
+  const plan = () => { clearTimeout(timer); mark(); if (running()) timer = setTimeout(() => go((idx + 1) % cards.length), 4000); };
+  const go = i => { idx = i; lock = Date.now() + 800; track.scrollTo({ left: cards[i].offsetLeft - cards[0].offsetLeft, behavior: calm.matches ? "auto" : "smooth" }); plan(); };
+  const nearest = () => { let best = 0, d = 1e9; cards.forEach((c, i) => { const x = Math.abs(c.offsetLeft - cards[0].offsetLeft - track.scrollLeft); if (x < d) { d = x; best = i; } }); return best; };
+  track.addEventListener("scroll", () => { if (Date.now() < lock) return; const n = nearest(); if (n !== idx) { idx = n; plan(); } }, { passive: true });
+  dots.forEach((d, i) => d.addEventListener("click", () => go(i)));
+  track.addEventListener("keydown", e => { const k = { ArrowRight: idx + 1, ArrowLeft: idx - 1, Home: 0, End: cards.length - 1 }[e.key]; if (k === undefined || wide.matches) return; e.preventDefault(); go(Math.max(0, Math.min(cards.length - 1, k))); });
+  const hold = v => () => { held = v; plan(); };
+  root.addEventListener("touchstart", hold(true), { passive: true }); root.addEventListener("touchend", hold(false)); root.addEventListener("touchcancel", hold(false));
+  root.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") hold(true)(); }); root.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") hold(false)(); });
+  root.addEventListener("focusin", e => { if (e.target.matches(":focus-visible")) hold(true)(); }); root.addEventListener("focusout", e => { if (!root.contains(e.relatedTarget)) hold(false)(); });
+  new IntersectionObserver(es => { shown = es[es.length - 1].isIntersecting; plan(); }, { threshold: .4 }).observe(root);
+  document.addEventListener("visibilitychange", plan);
+  const fit = () => { track.tabIndex = wide.matches ? -1 : 0; plan(); }; wide.addEventListener("change", fit); calm.addEventListener("change", plan); fit();
+  if (!calm.matches) { root.classList.add("rv"); const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { root.classList.add("in"); io.disconnect(); } }, { threshold: .15 }); io.observe(root); }
+})();
+
 /* ---------- the tabletop camera (from the motion study) ---------- */
 (() => {
   const board = document.querySelector(".board"), viewport = document.querySelector(".viewport"), travel = document.querySelector(".travel");
@@ -534,8 +600,10 @@ toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)
   const PAY = 3;
   /* positions on the tabletop in sheet widths and heights. hold is extra scroll spent resting on a stop (the phone sheet, so its screen can change) */
   const stops = [{ x: 0, y: 0, tilt: -2 }, { x: 1.12, y: .16, tilt: 3 }, { x: 1.25, y: 1.37, tilt: -3 }, { x: .13, y: 1.46, tilt: 1.5 }, { x: 1.15, y: 2.66, tilt: 2.5 }, { x: .05, y: 2.86, tilt: -1.5 }];
-  const hold = [0, 0, 0, 1.1, 0], N = stops.length;
-  const len = hold.map(h => 1 + h), start = len.map((_, i) => len.slice(0, i).reduce((a, b) => a + b, 0)), total = len.reduce((a, b) => a + b, 0);
+  /* the timeline in units (1 unit = UNIT svh): rest at a stop, then a MOVE to the next one. Rests: 0.3 each (~38svh), the phone sheet 1.3 (its screen pushes in the middle), the last 0.7 (0.3 pure rest, then the last 0.4 dissolves the tabletop into the page) */
+  const N = stops.length, rest = [.3, .3, .3, 1.3, .3, .7], MOVE = .74, OUT = .4;
+  const start = [], leave = []; let total = 0;
+  rest.forEach((r, i) => { start[i] = total; leave[i] = total + r; total += r + (i < N - 1 ? MOVE : 0); });
   const UNIT = 127; /* svh of scroll per unit */
   let width, height, range, frame;
   const clamp = v => Math.min(1, Math.max(0, v)), mix = (a, b, t) => a + (b - a) * t, smooth = t => t * t * (3 - 2 * t);
@@ -544,17 +612,17 @@ toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)
   function paint() {
     frame = 0;
     const r = travel.getBoundingClientRect(), on = r.bottom > innerHeight - 40 && r.top < innerHeight;
-    controls.classList.toggle("off", !on); document.body.classList.toggle("hero-on", on);
+    document.body.classList.toggle("hero-on", on);
     if (reduce.matches) {
+      controls.classList.toggle("off", !on);
       const mid = innerHeight / 2; let best = 0, dist = Infinity;
       sheets.forEach((s, i) => { const b = s.getBoundingClientRect(), d = Math.abs(b.top + b.height / 2 - mid); if (d < dist) { dist = d; best = i; } });
       highlight(best); return;
     }
     const u = clamp(scrollY / range) * total;
     let k = 0; while (k < N - 2 && u >= start[k + 1]) k++;
-    const f = clamp(u - start[k] - hold[k]);
     /* rest to read, then lift and follow a shallow arc to the next sheet */
-    const t = clamp((f - .13) / .74), ease = smooth(t), lift = Math.sin(Math.PI * ease);
+    const t = clamp((u - leave[k]) / MOVE), ease = smooth(t), lift = Math.sin(Math.PI * ease);
     const a = stops[k], b = stops[k + 1], dx = (b.x - a.x) * width, dy = (b.y - a.y) * height;
     const x = a.x * width + dx * ease - dy * .08 * lift, y = a.y * height + dy * ease + dx * .08 * lift;
     board.style.transform = `scale(${1 - .22 * lift}) rotate(${-mix(a.tilt, b.tilt, ease) * .8 + 1.6 * lift}deg) translate(${-x}px, ${-y}px)`;
@@ -562,7 +630,11 @@ toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)
     highlight(here < links.length ? here : -1);
     closing.inert = here !== N - 1;
     /* the phone sheet: its screen slides on as you scroll, one screen pushing the other out */
-    track.style.setProperty("--push", smooth(clamp((u - start[PAY] - .3) / .45)).toFixed(4));
+    track.style.setProperty("--push", smooth(clamp((u - start[PAY] - .4) / .45)).toFixed(4));
+    /* release: the tabletop dissolves into the page canvas, and the chapter bar (hero only) leaves with it */
+    const out = smooth(clamp((u - (total - OUT)) / OUT));
+    viewport.style.setProperty("--out", out.toFixed(4));
+    controls.classList.toggle("off", !on || out > .05);
   }
   const queue = () => { if (!frame) frame = requestAnimationFrame(paint); };
   function measure() {
@@ -572,7 +644,7 @@ toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)
     width = sheets[0].offsetWidth; height = sheets[0].offsetHeight;
     range = Math.max(1, travel.offsetHeight - viewport.offsetHeight);
     sheets.forEach((s, i) => { s.style.left = reduce.matches ? "" : stops[i].x * width + "px"; s.style.top = reduce.matches ? "" : stops[i].y * height + "px"; s.style.setProperty("--tilt", stops[i].tilt + "deg"); s.inert = false; });
-    if (reduce.matches) { board.style.transform = ""; track.style.setProperty("--push", 1); } /* the static layout shows the finished screen */
+    if (reduce.matches) { board.style.transform = ""; track.style.setProperty("--push", 0); } /* the static layout shows Withdraw in the hand and Money credited on a second screen beside it */
     paint();
   }
   /* chapters (#kitchen ...) move the camera, other ids (#moments ...) are ordinary anchors */
@@ -580,7 +652,7 @@ toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)
     const i = sheets.findIndex(s => "#" + s.id === hash);
     if (i >= 0) {
       if (reduce.matches) sheets[i].scrollIntoView({ block: "center" });
-      else scrollTo({ top: ((i < start.length ? start[i] : total) + (i === PAY ? .05 : 0)) / total * range, behavior: smoothly ? "smooth" : "auto" });
+      else scrollTo({ top: (start[i] + (i === PAY ? .05 : .12)) / total * range, behavior: smoothly ? "smooth" : "auto" });
       return true;
     }
     const el = hash && hash.length > 1 && document.getElementById(hash.slice(1));

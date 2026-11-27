@@ -217,8 +217,9 @@
           press: { k: "red", op: 0.55 * P(p, 0.42, 0.47) * (1 - P(p, 0.5, 0.55)) }, tap: { k: "red", q } })
         + note + (slipOp > 0 ? `<g opacity="${slipOp}" transform="rotate(4 306 112)">` + flare(326, 132, P(p, 0.84, 0.98)) + slip(268, 70, 76, "₹1,500", tick) + `</g>` : ""); },
     /* 7 Everywhere. The phone and the slip leave, the language phone rises, every language round it */
-    p => { const off = L(0, 720, EI(P(p, 0, 0.26))), leaving = off < 719 ? device({ off, hand: { kind: "thumb", wipe: 1 }, pages: [["done", 0]] }) + `<g opacity="${1 - P(p, 0, 0.2)}" transform="rotate(4 306 112)">` + slip(268, 70, 76, "₹1,500", 1) + `</g>` : "";
-      return leaving + device({ sx: 80, sy: 90, h: 446, off: L(720, 0, E(P(p, 0.3, 0.58))), pages: [["lang", 0]], shadow: true }) + tokens(E(C((p - 0.45) * 2))); },
+    /* the last beat is short (it also exits over its final quarter in site.html), so everything here has settled by p 0.7 */
+    p => { const off = L(0, 720, EI(P(p, 0, 0.2))), leaving = off < 719 ? device({ off, hand: { kind: "thumb", wipe: 1 }, pages: [["done", 0]] }) + `<g opacity="${1 - P(p, 0, 0.15)}" transform="rotate(4 306 112)">` + slip(268, 70, 76, "₹1,500", 1) + `</g>` : "";
+      return leaving + device({ sx: 80, sy: 90, h: 446, off: L(720, 0, E(P(p, 0.2, 0.45))), pages: [["lang", 0]], shadow: true }) + tokens(E(P(p, 0.38, 0.7))); },
   ];
 
   const FILES = ["dabba-kitchen-wall", "dabba-shelf", "dabba-tin-body", "dabba-tin-lid-steel", "dabba-tin-lid-orange", "dabba-note-rolled", "dabba-note-flat", "dabba-jar-left", "dabba-jar-right",
