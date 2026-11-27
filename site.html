@@ -316,7 +316,7 @@ const SUM = BEATS.reduce((a, b) => a + b.w, 0), EDGES = BEATS.reduce((acc, b) =>
 dots.innerHTML = BEATS.map(() => "<i></i>").join("");
 const desktop = matchMedia("(min-width: 900px)");
 let cur = -1, queued = false;
-function progress() { const r = opener.getBoundingClientRect(); return C(-r.top / (opener.offsetHeight - innerHeight)); }
+function progress() { const r = opener.getBoundingClientRect(), d = opener.offsetHeight - innerHeight; return d > 0 ? C(-r.top / d) : 0; } // a hidden frame has no height: 0/0 would draw NaN
 function draw() {
   queued = false;
   const g = progress(); let i = 0; while (i < BEATS.length - 1 && g >= EDGES[i + 1]) i++;

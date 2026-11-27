@@ -51,14 +51,10 @@ body.bare #pf { width: 100%; height: 100%; }
 <div class="bar">
   <h1>Rupyon · Maa hai na</h1>
   <div class="seg" role="group" aria-label="View"><button type="button" data-view="phone" aria-pressed="false">Phone</button><button type="button" data-view="desktop" aria-pressed="false">Desktop</button><button type="button" data-view="both" aria-pressed="false">Both</button></div>
-  <div class="seg" role="group" aria-label="Variation"><button type="button" data-site="site.html" aria-pressed="false">Original</button><button type="button" data-site="kiwi.html" aria-pressed="false">Kiwi beats</button></div>
+  <div class="seg" role="group" aria-label="Variation"><button type="button" data-site="site.html" aria-pressed="false">Original</button><button type="button" data-site="kiwi.html" aria-pressed="false">Kiwi beats</button><button type="button" data-site="moodboard.html" aria-pressed="false">Moodboard</button></div>
   <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="hi" lang="hi" aria-pressed="false">हिंदी</button></div>
   <label class="jump">Jump to
-    <select id="jump">
-      <option value="#beat-1">1 · Hero</option><option value="#beat-2">2 · Days add up</option><option value="#beat-3">3 · Into the phone</option><option value="#beat-4">4 · In her hand</option>
-      <option value="#beat-5">5 · The need</option><option value="#beat-6">6 · Maa hai na</option><option value="#beat-7">7 · Everywhere</option>
-      <option value="#moments">Moments</option><option value="#rhythm">Save the way you earn</option><option value="#yours">Your money</option><option value="#language">Language</option><option value="#start">Start</option>
-    </select>
+    <select id="jump"></select>
   </label>
 </div>
 <div class="stage" id="stage">
@@ -117,13 +113,23 @@ document.querySelectorAll("[data-lang]").forEach(x => x.setAttribute("aria-press
 /* the two variations: the original scroll story, and the one that moves to Kiwi's beats */
 function markSite() { document.querySelectorAll("button[data-site]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.site === SITE))); }
 function setSite(s) {
-  if (!["site.html", "kiwi.html"].includes(s)) return;
-  SITE = s; try { localStorage.setItem("rupyon-site", SITE); } catch (e) {}
+  if (!["site.html", "kiwi.html", "moodboard.html"].includes(s)) return;
+  SITE = s; hash = ""; buildJump(); try { localStorage.setItem("rupyon-site", SITE); } catch (e) {}
   markSite(); [pf, df].forEach(f => { if (f.dataset.site) load(f); });
 }
 document.querySelectorAll("button[data-site]").forEach(b => b.addEventListener("click", () => setSite(b.dataset.site)));
 markSite();
+/* the Jump-to list follows the variation: beats for the first two, chapters for Moodboard, and the shared sections for all */
+const BEATS = [["#beat-1", "1 · Hero"], ["#beat-2", "2 · Days add up"], ["#beat-3", "3 · Into the phone"], ["#beat-4", "4 · In her hand"], ["#beat-5", "5 · The need"], ["#beat-6", "6 · Maa hai na"], ["#beat-7", "7 · Everywhere"]];
+const CHAPTERS = [["#kitchen", "1 · Kitchen"], ["#savings", "2 · Daily savings"], ["#fees", "3 · School fees"], ["#pay", "4 · Phone pays"], ["#bicycle", "5 · Bicycle"], ["#closing", "6 · Closing"]];
+const SECTIONS = [["#moments", "Moments"], ["#rhythm", "Save the way you earn"], ["#yours", "Your money"], ["#language", "Language"], ["#start", "Start"]];
 const jumpSel = document.getElementById("jump");
+function buildJump() {
+  const list = (SITE === "moodboard.html" ? CHAPTERS : BEATS).concat(SECTIONS);
+  jumpSel.innerHTML = list.map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
+  jumpSel.value = hash && list.some(([v]) => v === hash) ? hash : list[0][0];
+}
+buildJump();
 if (location.hash && jumpSel.querySelector(`option[value="${location.hash}"]`)) jumpSel.value = location.hash;
 jumpSel.addEventListener("change", e => { hash = e.target.value; [pf, df].forEach(f => send(f, { hash })); });
 addEventListener("resize", layout);

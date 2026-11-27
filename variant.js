@@ -1,17 +1,17 @@
-/* The switch between the two variations, Original (site.html) and Kiwi beats (kiwi.html), on both pages.
+/* The switch between the three variations, Original (site.html), Kiwi beats (kiwi.html) and Moodboard (moodboard.html), on every page.
    It shows when the page is on its own, or when the presenting page (index.html) has stepped aside on a phone;
    on a wider screen index.html has the same switch in its bar. The choice is remembered on this device. */
 (function () {
-  const PAGES = [["site.html", { en: "Original", hi: "मूल" }], ["kiwi.html", { en: "Kiwi beats", hi: "Kiwi बीट्स" }]];
-  const here = PAGES.findIndex(([f]) => location.pathname.endsWith(f)) === 1 ? 1 : 0;
+  const PAGES = [["site.html", { en: "Original", hi: "मूल" }], ["kiwi.html", { en: "Kiwi beats", hi: "Kiwi बीट्स" }], ["moodboard.html", { en: "Moodboard", hi: "मूडबोर्ड" }]];
+  const here = Math.max(0, PAGES.findIndex(([f]) => location.pathname.endsWith(f)));
   const framed = window.parent !== window;
   const css = `
   .variant { position: fixed; z-index: 30; left: 0; right: 0; width: max-content; margin-inline: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-    display: inline-grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px; background: rgba(26, 19, 16, .88);
+    display: inline-grid; grid-template-columns: repeat(3, 1fr); padding: 3px; border-radius: 999px; background: rgba(26, 19, 16, .88);
     box-shadow: 0 8px 24px -10px rgba(26, 19, 16, .5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     transition: opacity .3s cubic-bezier(0.23, 1, 0.32, 1), transform .3s cubic-bezier(0.23, 1, 0.32, 1); }
   .variant[hidden] { display: inline-grid; opacity: 0; transform: translateY(8px); pointer-events: none; }
-  .variant .vt { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: #F97316;
+  .variant .vt { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(33.333% - 2px); border-radius: 999px; background: #F97316;
     transform: translateX(calc(var(--at) * 100%)); transition: transform .24s cubic-bezier(0.23, 1, 0.32, 1); }
   .variant button { position: relative; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: #FDF5E9;
     font: 600 13px Inter, "Noto Sans Devanagari", system-ui, sans-serif; white-space: nowrap; cursor: pointer; }
