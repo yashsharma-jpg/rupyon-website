@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rupyon · Maa hai na</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@500;600&family=Noto+Sans+Bengali:wght@600&family=Noto+Sans+Gujarati:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&family=Noto+Sans+Kannada:wght@600&display=swap">
+<style>
+/* Rupyon site, variation "Kiwi beats": the same story and order as site.html, moved the way Liquidink's Kiwi site moves.
+   The scroll drives the story (GSAP ScrollTrigger, scrubbed, so it plays backwards too); small things keep a beat of their
+   own in CSS (the Turn mark, the orbit of words, the pulses, the marquee) so they stay smooth while the page is busy. */
+:root {
+  --canvas: #FDF5E9; --card: #FFFFFF; --ink: #1A1310; --ink-2: #5B4A3F; --ink-3: #8A7666;
+  --brand-50: #FFF7ED; --brand-100: #FFEDD5; --brand-200: #FED7AA; --brand-500: #F97316; --brand-600: #EA580C; --brand-700: #C2410C; --brand-800: #9A3412;
+  --f-head: "Anek Latin", "Inter", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-deva: "Noto Sans Devanagari", "Noto Sans", "Inter", system-ui, sans-serif;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --beat: 1.4s; /* two beats: the mark turns 45 degrees every 0.7s, as Kiwi's mark shifts shape */
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+body { background: var(--canvas); color: var(--ink); font: 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; }
+[lang="hi"] { font-family: var(--f-deva); }
+h1, h2, h3 { font-family: var(--f-head); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+img { max-width: 100%; }
+a, button { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 3px; }
+
+/* ---------- buttons: press feedback, an arrow that leans in on hover ---------- */
+.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 24px; border-radius: 999px; border: 0; overflow: hidden;
+  background: var(--brand-500); color: #fff; font: 600 16px var(--f-body); text-decoration: none; cursor: pointer;
+  transition: background-color .2s ease, transform .14s var(--ease-out); }
+.btn .arr { transition: transform .2s var(--ease-out); }
+.btn:active { transform: scale(.97); }
+.btn.sm { height: 36px; padding: 0 16px; font-size: 14px; }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { background: var(--brand-600); }
+  .btn:hover .arr { transform: translateX(3px); }
+}
+.risk { font-size: 11px; line-height: 1.5; color: var(--ink-3); }
+
+/* ---------- nav ---------- */
+.nav { position: fixed; z-index: 20; inset: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--gutter) 12px; pointer-events: none; }
+.nav > * { pointer-events: auto; }
+.logo { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink); font: 600 22px var(--f-head); letter-spacing: -0.02em; }
+.logo .mk-slot { display: block; width: 30px; height: 30px; } .logo svg { display: block; width: 100%; height: 100%; transition: transform .5s var(--ease-in-out); }
+@media (hover: hover) and (pointer: fine) { .logo:hover svg { transform: rotate(45deg); } }
+.mk-slot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.lang-toggle { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .85); border: 1px solid var(--brand-100); box-shadow: 0 1px 2px rgba(26, 19, 16, .06); }
+.lang-toggle .thumb { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: var(--ink); transition: transform .22s var(--ease-out); }
+.lang-toggle[data-on="hi"] .thumb { transform: translateX(100%); }
+.lang-toggle button { position: relative; height: 30px; min-width: 52px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 13px var(--f-body); cursor: pointer; transition: color .22s ease; }
+.lang-toggle button[lang="hi"] { font-family: var(--f-deva); }
+.lang-toggle button[aria-pressed="true"] { color: #fff; }
+:root[lang="hi"] body, :root[lang="hi"] .btn { font-family: var(--f-deva); }
+:root[lang="hi"] h2 { font-family: var(--f-deva); letter-spacing: 0; line-height: 1.4; }
+@media (max-width: 479px) { .nav-cta { display: none; } }
+
+/* ---------- words that rise into place, one after another ---------- */
+.rise .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
+.rise .w > span { display: inline-block; transform: translateY(105%); transition: transform .7s var(--ease-out); transition-delay: calc(var(--i) * 45ms); }
+.rise.show .w > span { transform: none; }
+
+/* ---------- opener ---------- */
+.opener { position: relative; height: 820svh; }
+.stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.frame { position: absolute; inset: 0; background: var(--canvas); overflow: hidden; }
+.fit { position: absolute; left: 50%; top: 50%; width: 360px; height: 640px; transform-origin: 0 0; }
+.side { display: contents; }
+.copy { position: absolute; left: var(--gutter); right: var(--gutter); text-align: center; pointer-events: none; z-index: 5; }
+.copy.top { top: calc(10svh + 8px); }
+.copy.bottom { bottom: 9svh; }
+.copy .line { font: 600 28px/1.25 var(--f-head); letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
+:root[lang="hi"] .copy .line { font: 600 26px/1.4 var(--f-deva); letter-spacing: 0; }
+.cta { position: absolute; z-index: 5; left: var(--gutter); right: var(--gutter); bottom: calc(4svh + 28px); display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+  opacity: 0; transform: translateY(12px); transition: opacity .4s var(--ease-out), transform .4s var(--ease-out); pointer-events: none; }
+.cta.show { opacity: 1; transform: none; pointer-events: auto; }
+.cta .risk { max-width: 34ch; }
+.rail { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(249, 115, 22, .15); }
+.rail span { display: block; height: 100%; width: 100%; background: var(--brand-500); transform: scaleX(0); transform-origin: 0 50%; }
+.hint { display: none; position: absolute; font-size: 12px; font-weight: 500; color: var(--ink-3); letter-spacing: .04em; transition: opacity .3s ease; flex-direction: column; gap: 2px; }
+.hint svg { animation: nudge 1.6s var(--ease-in-out) infinite; }
+@keyframes nudge { 50% { transform: translateY(4px); } }
+.dots { display: none; }
+
+/* the scene: a 360 x 640 world, scaled to fit. Everything in it is placed in that box */
+.world { position: absolute; inset: 0; background: linear-gradient(#FDF5E9, #FBE6C8); clip-path: inset(0 round 0px); }
+.world > * { position: absolute; }
+.flood { inset: 0; clip-path: circle(0% at 50% 50%); }
+.frame-title { position: absolute; left: 0; right: 0; top: 30px; margin: 0; text-align: center; font: 600 15px var(--f-head); color: var(--ink); opacity: 0; }
+:root[lang="hi"] .frame-title { font-family: var(--f-deva); }
+.frame-chip { position: absolute; left: 0; right: 0; margin-inline: auto; width: max-content; bottom: 26px; opacity: 0; white-space: nowrap; background: #fff; border: 1px solid #F3DFC4; border-radius: 999px; padding: 6px 14px; font: 600 12px var(--f-body); color: #6B5545; }
+
+/* the Turn mark, split so its petals breathe and its centre turns on the beat */
+.mark { width: 120px; height: 120px; left: 120px; top: 240px; }
+.mark svg { width: 100%; height: 100%; overflow: visible; }
+.mark .petal { transform-box: fill-box; transform-origin: center; animation: petal var(--beat) var(--ease-in-out) infinite; }
+.mark .core { transform-box: view-box; transform-origin: 50px 50px; animation: core var(--beat) var(--ease-in-out) infinite; }
+@keyframes core { 0% { transform: rotate(0deg); } 50% { transform: rotate(45deg); } 100% { transform: rotate(90deg); } }
+@keyframes petal { 0%, 50%, 100% { transform: scale(1); } 22%, 72% { transform: scale(1.14); } }
+
+/* the orbit of words, turning slowly round the mark */
+.orbit { width: 300px; height: 300px; left: 30px; top: 150px; }
+.orbit svg { width: 100%; height: 100%; animation: spin 36s linear infinite; }
+.orbit text { font: 600 13px var(--f-body); fill: #8A7666; letter-spacing: .04em; }
+:root[lang="hi"] .orbit text { font-family: var(--f-deva); letter-spacing: 0; }
+.orbit .ring { fill: none; stroke: #F3DFC4; stroke-width: 1; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* pulses: three rings breathing out from a point */
+.pulse { width: 240px; height: 240px; margin: -120px 0 0 -120px; opacity: 0; }
+.pulse i { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--brand-500); animation: ring 2.4s var(--ease-out) infinite; opacity: 0; }
+.pulse i:nth-child(2) { animation-delay: .8s; }
+.pulse i:nth-child(3) { animation-delay: 1.6s; }
+@keyframes ring { 0% { transform: scale(.55); opacity: .5; } 100% { transform: scale(1.35); opacity: 0; } }
+
+/* beat 2: the tin on a pill that rounds into a circle */
+.pill { width: 290px; height: 290px; left: 35px; top: 175px; background: #fff; border: 0; box-shadow: 0 20px 40px -24px rgba(26, 19, 16, .25); clip-path: inset(70px 0 round 75px); opacity: 0; }
+.tin { width: 170px; height: 170px; left: 95px; top: 244px; opacity: 0; }
+.tin img { position: absolute; display: block; max-width: none; }
+.tin .body { inset: 0; width: 100%; height: 100%; }
+.tin .lid, .tin .notes { position: absolute; }
+.tin .lid { left: -25%; top: -36.33%; width: 150%; height: 100%; transform-origin: 50% 59%; }
+.tin .notes { left: 10%; right: 10%; top: -160%; height: 181.3%; overflow: hidden; }
+.tin .notes img { left: 50%; top: 0; width: 46%; margin-left: -23%; }
+.shadow { width: 130px; height: 14px; left: 115px; top: 397px; border-radius: 50%; background: rgba(26, 19, 16, .12); opacity: 0; }
+.day { width: 72px; height: 84px; left: 256px; top: 78px; background: #fff; border: 1px solid #F3DFC4; border-radius: 14px; overflow: hidden; text-align: center; opacity: 0; box-shadow: 0 8px 20px -12px rgba(26, 19, 16, .25); }
+.day b { display: block; height: 20px; background: var(--brand-500); color: #FFE8D4; font: 600 10px/20px var(--f-body); letter-spacing: .08em; }
+.day span { display: block; font: 600 34px/60px var(--f-head); font-variant-numeric: tabular-nums; }
+
+/* beat 3: her phone, drawn here, so the tin can go into it */
+.phone { width: 150px; height: 320px; left: 105px; top: 150px; background: var(--ink); border-radius: 24px; padding: 6px; opacity: 0; box-shadow: 0 30px 50px -30px rgba(26, 19, 16, .5); }
+.phone::before { content: ""; position: absolute; z-index: 2; left: 50%; top: 12px; width: 38px; height: 7px; margin-left: -19px; border-radius: 4px; background: var(--ink); }
+.scr { position: relative; width: 100%; height: 100%; border-radius: 19px; overflow: hidden; background: var(--canvas); }
+.scr .hd { position: absolute; inset: 0 0 auto; height: 26%; background: var(--brand-500); color: #FFE8D4; text-align: center; font: 600 9px/1 var(--f-body); padding-top: 10%; }
+.scr .hd b { display: block; color: #fff; font: 600 21px/1.2 var(--f-head); margin-top: 6px; }
+.scr .mini { position: absolute; left: 27%; width: 46%; top: 40%; aspect-ratio: 1; }
+.scr .mini img { position: absolute; max-width: none; }
+.scr .mini .body { inset: 0; width: 100%; }
+.scr .mini .lid { left: -25%; top: -36.33%; width: 150%; }
+.scr .chip { position: absolute; left: 10%; right: 10%; bottom: 7%; height: 7%; border-radius: 999px; background: #fff; border: 1px solid #F3DFC4; font: 600 7.5px/1 var(--f-body); color: #6B5545; display: grid; place-items: center; white-space: nowrap; }
+
+/* beat 4 and 6: her hand, with the screen behind the thumb */
+.hand { opacity: 0; }
+.hand > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; z-index: 2; pointer-events: none; }
+.hand .scr { position: absolute; border-radius: 10%/5%; }
+.hand1 { width: 366px; height: 549px; left: -3px; top: 95px; }
+.hand1 .scr { left: 24.51%; top: 10.09%; width: 41.02%; height: 53.19%; }
+.hand2 { width: 405px; height: 608px; left: 12px; top: 113px; }
+.hand2 .scr { left: 13.18%; top: 6.97%; width: 56.74%; height: 66.99%; background: #fff; }
+.wd .hd { height: 24%; padding-top: 9%; font-size: 11px; }
+.wd .hd b { font-size: 30px; }
+.wd .mini { top: 34%; width: 38%; left: 31%; }
+.wd .go { position: absolute; left: 8%; right: 8%; top: 83%; height: 10%; border-radius: 999px; background: var(--brand-500); color: #fff; font: 600 13px/1 var(--f-body); display: flex; align-items: center; padding-left: 8%; }
+.wd .done { position: absolute; left: 9%; right: 4%; top: 68%; display: flex; align-items: center; gap: 8px; font: 600 12px var(--f-body); color: var(--ink); opacity: 0; }
+.wd .done i { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--brand-500); display: grid; place-items: center; }
+.tap { width: 44px; height: 44px; margin: -22px 0 0 -22px; left: 224px; top: 519px; border-radius: 50%; background: rgba(255, 255, 255, .7); opacity: 0; z-index: 3; }
+
+/* beat 5: her daughter with the fee slip, and the family's needs popping round her */
+.girl { width: 410px; height: 614px; left: -25px; top: 106px; opacity: 0; }
+.girl img { width: 100%; height: 100%; max-width: none; }
+.girl .fee { position: absolute; left: 21.78%; top: 52.99%; width: 56.05%; height: 23.89%; display: grid; place-items: end center; padding-bottom: 6%; font: 600 26px var(--f-head); color: var(--ink); }
+#needs, #glyphs { inset: 0; }
+#needs > *, #glyphs > * { position: absolute; }
+.need { width: 64px; height: 64px; border-radius: 50%; background: #fff; border: 1px solid #F3DFC4; display: grid; place-items: center; opacity: 0; box-shadow: 0 10px 24px -14px rgba(26, 19, 16, .3); }
+.need img { width: 46px; height: 46px; }
+
+/* beat 6: the burst, the paid slip */
+.burst { width: 420px; height: 420px; left: -30px; top: 120px; opacity: 0; }
+.burst svg { width: 100%; height: 100%; }
+.slip { width: 76px; left: 254px; top: 92px; background: #fff; border: 1.5px solid #EAD3B3; border-radius: 6px; overflow: hidden; opacity: 0; box-shadow: 0 12px 24px -14px rgba(26, 19, 16, .35); }
+.slip b { display: block; height: 11px; background: var(--brand-500); }
+.slip i { display: block; height: 3px; margin: 6px 8px 0; border-radius: 2px; background: #EBDDCB; }
+.slip i:nth-of-type(2) { margin-right: 26px; }
+.slip span { display: block; text-align: center; font: 600 16px var(--f-head); padding: 6px 0 10px; }
+.paid { width: 26px; height: 26px; left: 312px; top: 160px; border-radius: 50%; background: var(--brand-500); display: grid; place-items: center; opacity: 0; }
+
+/* beat 7: every language, round the mark */
+.glyph { width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%; background: var(--brand-100); border: 1px solid #F3DFC4; display: grid; place-items: center; font: 600 19px "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Gujarati", "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Kannada", sans-serif; opacity: 0; }
+.glyph:nth-child(odd) { background: var(--brand-200); }
+
+/* ---------- sections ---------- */
+.sec { padding-block: 72px; padding-left: var(--gutter); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.sec-in { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.sec-head { display: flex; flex-direction: column; gap: 8px; max-width: 40rem; }
+.label { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-700); }
+.sec-head h2 { font-size: 30px; line-height: 1.3; }
+.sec-head .sub { font-size: 17px; color: var(--ink-2); }
+.white { background: var(--card); }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s var(--ease-out), transform .6s var(--ease-out); transition-delay: calc(var(--i, 0) * 60ms); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* moments: a fan of cards that shuffles, like Kiwi's ₹40 cards */
+.fan { position: relative; height: 470px; margin-top: 8px; --spread: 70px; --tilt: 7deg; }
+.moment { position: absolute; left: 50%; top: 16px; width: 280px; margin-left: -140px; background: var(--card); border: 1px solid var(--brand-100); border-radius: 18px; padding: 14px;
+  display: flex; flex-direction: column; gap: 8px; cursor: pointer; transform-origin: 50% 120%;
+  box-shadow: 0 1px 2px rgba(26, 19, 16, .05), 0 24px 40px -28px rgba(26, 19, 16, .35);
+  transform: translateX(calc(var(--k) * var(--spread))) translateY(calc(var(--ak) * 14px)) rotate(calc(var(--k) * var(--tilt))) scale(calc(1 - var(--ak) * .05));
+  transition: transform .65s var(--ease-in-out), box-shadow .3s ease; }
+.fan:not(.open) .moment { transform: translateY(40px) rotate(0deg) scale(.94); }
+.moment[aria-current="true"] { box-shadow: 0 2px 4px rgba(26, 19, 16, .06), 0 36px 60px -30px rgba(154, 52, 18, .45); }
+.moment:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 3px; }
+.art { aspect-ratio: 4 / 3; border-radius: 12px; background: var(--brand-50); display: grid; place-items: center; overflow: hidden; }
+.art img { width: 74%; height: 86%; object-fit: contain; transition: transform .5s var(--ease-out); }
+.moment[aria-current="true"] .art img { transform: scale(1.06) rotate(-3deg); }
+.mtop { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.who { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; background: var(--brand-100); color: var(--brand-800); }
+.who.bahu { background: var(--brand-200); color: var(--ink); }
+.who.self { background: var(--ink); color: var(--canvas); }
+:root[lang="hi"] .who { letter-spacing: 0; text-transform: none; font-size: 12px; }
+.amt { font: 600 24px var(--f-head); font-variant-numeric: tabular-nums; color: var(--brand-800); }
+.moment .mline { font: 600 18px/1.35 var(--f-head); }
+:root[lang="hi"] .moment .mline { font-family: var(--f-deva); line-height: 1.45; }
+.moment .saved { font-size: 13px; color: var(--ink-3); border-top: 1px dashed var(--brand-200); padding-top: 8px; margin-top: auto; }
+.picker { align-self: center; position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 4px; border-radius: 999px; background: var(--ink); }
+.picker .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / var(--n)); border-radius: 999px; background: var(--brand-500); transform: translateX(calc(var(--at) * 100%)); transition: transform .45s var(--ease-in-out); }
+.picker button { position: relative; height: 34px; padding: 0 14px; border: 0; background: transparent; color: #FDF5E9; font: 600 13px var(--f-body); cursor: pointer; white-space: nowrap; }
+:root[lang="hi"] .picker button { font-family: var(--f-deva); }
+@media (max-width: 599px) { .picker button { width: 34px; padding: 0; } .picker button span { display: none; } .picker button::after { content: ""; display: block; width: 6px; height: 6px; margin: auto; border-radius: 50%; background: #FDF5E9; opacity: .6; } }
+
+.calc { display: grid; gap: 16px; background: var(--canvas); border: 1px solid var(--brand-100); border-radius: 20px; padding: 20px; }
+.calc-in { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.field { display: flex; flex-direction: column; gap: 10px; }
+.flabel { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+.flabel b { font: 600 20px var(--f-head); color: var(--ink); font-variant-numeric: tabular-nums; }
+.seg { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 4px; background: var(--card); border: 1px solid var(--brand-100); border-radius: 999px; }
+.seg .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 3); border-radius: 999px; background: var(--brand-500); transform: translateX(calc(var(--at, 0) * 100%)); transition: transform .24s var(--ease-out); }
+.seg button { position: relative; height: 40px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 15px var(--f-body); cursor: pointer; transition: color .2s ease; }
+.seg button[aria-pressed="true"] { color: #fff; }
+.calc input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--brand-500); }
+.calc-out { position: relative; background: var(--card); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow: hidden; }
+.calc-out .mk { display: block; position: absolute; right: -36px; top: -36px; width: 140px; height: 140px; opacity: .12; }
+.calc-out .mk .core { transform-origin: 50px 50px; transition: transform .5s var(--ease-in-out); }
+.olabel { font-size: 14px; color: var(--ink-2); }
+.total { font: 600 44px/1.15 var(--f-head); color: var(--brand-800); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.osub { font-size: 15px; color: var(--ink-2); }
+.fine { font-size: 12px; color: var(--ink-3); margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--brand-200); }
+:root[lang="hi"] .seg button { font-family: var(--f-deva); }
+.note-line { font-size: 15px; color: var(--ink-2); }
+
+.trust { display: grid; gap: 12px; }
+.tcard { background: var(--card); border: 1px solid var(--brand-100); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 6px; transform-origin: 50% 100%; }
+.tcard svg { width: 36px; height: 36px; margin-bottom: 6px; }
+.tcard b { font: 600 18px var(--f-head); }
+.tcard p { font-size: 15px; color: var(--ink-2); }
+
+/* languages: a marquee, two rows going opposite ways */
+.marquee { display: flex; flex-direction: column; gap: 12px; margin-inline: calc(var(--gutter) * -1); overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.track { display: flex; gap: 12px; width: max-content; animation: slide 38s linear infinite; }
+.track.rev { animation-direction: reverse; animation-duration: 44s; }
+.marquee:hover .track { animation-play-state: paused; }
+@keyframes slide { to { transform: translateX(-50%); } }
+.lang { flex: none; background: var(--card); border: 1px solid var(--brand-100); border-radius: 999px; padding: 10px 22px; font-weight: 600; font-size: 24px; white-space: nowrap; }
+.lang.o { background: var(--brand-500); border-color: var(--brand-500); color: #fff; }
+.lang:lang(bn) { font-family: "Noto Sans Bengali", sans-serif; }
+.lang:lang(gu) { font-family: "Noto Sans Gujarati", sans-serif; }
+.lang:lang(ta) { font-family: "Noto Sans Tamil", sans-serif; }
+.lang:lang(te) { font-family: "Noto Sans Telugu", sans-serif; }
+.lang:lang(kn) { font-family: "Noto Sans Kannada", sans-serif; }
+.lang:lang(mr), .lang:lang(hi) { font-family: var(--f-deva); }
+
+/* start: an orange flood that opens from the middle as you arrive */
+.start { position: relative; color: #fff; background: var(--card); overflow: hidden; }
+.start .bg { position: absolute; inset: 0; background: var(--brand-500); clip-path: circle(8% at 50% 60%); }
+.start .sec-in { position: relative; align-items: center; text-align: center; }
+.start .mark-big { display: block; width: 96px; height: 96px; }
+.start .mark-big .petal { transform-box: fill-box; transform-origin: center; animation: petal var(--beat) var(--ease-in-out) infinite; }
+.start .mark-big .core { transform-origin: 50px 50px; animation: core var(--beat) var(--ease-in-out) infinite; }
+.start h2 { font-size: 34px; line-height: 1.3; }
+.start .sub { color: #FFEDD5; font-size: 17px; }
+.start .btn { background: #fff; color: var(--brand-800); }
+@media (hover: hover) and (pointer: fine) { .start .btn:hover { background: var(--brand-50); } }
+.start .risk { color: #FFEDD5; max-width: 46ch; }
+footer { padding: 32px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 64px); display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; color: var(--ink-3); font-size: 13px; }
+
+@media (min-width: 900px) {
+  :root { --gutter: max(48px, calc((100vw - 1200px) / 2)); }
+  .nav { padding-top: 20px; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 72px; padding: 96px var(--gutter) 40px; }
+  .frame { position: relative; inset: auto; height: min(calc(100svh - 136px), 820px); aspect-ratio: 9 / 16; border-radius: 32px; box-shadow: 0 30px 60px -30px rgba(26, 19, 16, .35), 0 0 0 1px var(--brand-100); grid-column: 2; grid-row: 1; }
+  .side { display: flex; flex-direction: column; gap: 32px; grid-column: 1; grid-row: 1; min-height: 280px; justify-content: center; }
+  .copy, .copy.top, .copy.bottom, .cta { position: static; text-align: left; }
+  .copy .line, :root[lang="hi"] .copy .line { font-size: clamp(40px, 4.2vw, 60px); line-height: 1.2; }
+  :root[lang="hi"] .copy .line { line-height: 1.35; }
+  .cta { align-items: flex-start; text-align: left; }
+  .hint { display: flex; left: var(--gutter); align-items: flex-start; bottom: 48px; }
+  .dots { display: flex; gap: 8px; position: absolute; left: var(--gutter); top: 50%; margin-top: 180px; }
+  .dots i { width: 8px; height: 8px; border-radius: 4px; background: var(--brand-200); transform-origin: 0 50%; transition: background-color .3s ease, transform .4s var(--ease-out); }
+  .dots i.on { background: var(--brand-500); transform: scaleX(3.5); margin-right: 20px; }
+  .rail { display: none; }
+  .sec { padding-block: 112px; padding-left: var(--gutter); padding-right: var(--gutter); }
+  .sec-head h2 { font-size: 40px; }
+  .fan { height: 500px; --spread: 200px; --tilt: 5deg; }
+  .moment { width: 300px; margin-left: -150px; }
+  .trust { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .calc { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; padding: 28px; }
+  .calc-out { justify-content: center; padding: 28px; }
+  .total { font-size: 56px; }
+  .start h2 { font-size: 48px; }
+  .lang { font-size: 30px; padding: 12px 28px; }
+}
+/* on a phone the story line sits where the card title would, and says the same */
+@media (max-width: 899px) { .frame-title { display: none; } }
+/* fewer, gentler: the beats stop, words and sections fade instead of rising, the scroll is the browser's own */
+@media (prefers-reduced-motion: reduce) {
+  .mark .petal, .mark .core, .start .mark-big .petal, .start .mark-big .core, .orbit svg, .pulse i, .track, .hint svg { animation: none; }
+  .pulse i { opacity: .25; transform: scale(.9); }
+  .rise .w > span { transform: none; opacity: 0; transition: opacity .4s ease; }
+  .rise.show .w > span { opacity: 1; }
+  .reveal { transform: none; }
+  .moment { transition: transform .2s ease; }
+  .marquee .track { flex-wrap: wrap; width: auto; }
+  .marquee .dup { display: none; }
+}
+</style>
+</head>
+<body>
+
+
+
+<nav class="nav" aria-label="Rupyon">
+  <a class="logo" href="#top"><span class="mk-slot" data-mark="#F97316"></span>Rupyon</a>
+  <div class="nav-right">
+    <div class="lang-toggle" role="group" aria-label="Language" data-on="en"><span class="thumb" aria-hidden="true"></span><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="hi" aria-pressed="false" lang="hi">हिंदी</button></div>
+    <a class="btn sm nav-cta" href="#start"><span data-t="cta">Start With ₹100</span><span class="arr" aria-hidden="true">→</span></a>
+  </div>
+</nav>
+
+<main id="top">
+  <section class="opener" id="opener" aria-label="Maa hai na">
+    <div class="stage">
+      <div class="frame" id="frame">
+        <div class="fit" id="fit" role="img" aria-label="Rupyon story">
+          <div class="world" id="world">
+            <div class="flood" id="flood-peach" style="background:#FFEDD5"></div>
+            <div class="flood" id="flood-white" style="background:#fff"></div>
+            <div class="flood" id="flood-cream" style="background:linear-gradient(#FDF5E9,#FBE6C8)"></div>
+
+            <div class="orbit" id="orbit" aria-hidden="true"><svg viewBox="0 0 300 300"><defs><path id="orbit-path" d="M150 150 m-128 0 a128 128 0 1 1 256 0 a128 128 0 1 1 -256 0"/></defs>
+              <circle class="ring" cx="150" cy="150" r="104"/><circle class="ring" cx="150" cy="150" r="146" stroke-dasharray="2 6"/><text><textPath href="#orbit-path" id="orbit-text"></textPath></text></svg></div>
+            <div class="pulse" id="pulse" style="left:180px;top:300px" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="mark mk-slot" id="mark" data-mark="#F97316"></div>
+
+            <div class="pill" id="pill"></div>
+            <div class="shadow" id="shadow"></div>
+            <div class="tin" id="tin">
+              <div class="notes" id="notes"></div>
+              <img class="body" src="assets/dabba/dabba-tin-body.png" alt="">
+              <div class="lid" id="lid"><img src="assets/dabba/dabba-tin-lid-steel.png" alt="" style="position:absolute;inset:0;width:100%;height:100%"><img id="lid-orange" src="assets/dabba/dabba-tin-lid-orange.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;opacity:0"></div>
+            </div>
+            <div class="day" id="day"><b data-s="day">DAY</b><span id="day-n">1</span></div>
+
+            <div class="phone" id="phone"><div class="scr"><div id="phone-scr" style="position:absolute;inset:0"></div></div></div>
+            <div class="hand hand1" id="hand1"><div class="scr" id="hand1-scr"></div><img src="assets/dabba/hand-phone-hold-woman-screen.png" alt=""></div>
+
+            <div class="girl" id="girl"><img src="assets/dabba/dabba-daughter-slip.png" alt=""><span class="fee">₹1,500</span></div>
+            <div id="needs"></div>
+
+            <div class="burst" id="burst"><svg viewBox="0 0 420 420" id="burst-svg"></svg></div>
+            <div class="hand hand2" id="hand2"><div class="scr wd" id="wd">
+              <div class="hd"><span data-s="withdraw">Withdraw</span><b>₹1,500</b></div>
+              <div class="mini" id="wd-tin"><img class="body" src="assets/dabba/dabba-tin-body.png" alt=""><img class="lid" id="wd-lid" src="assets/dabba/dabba-tin-lid-orange.png" alt=""></div>
+              <div class="done" id="wd-done"><i><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i><span data-s="onWay">On its way to your bank</span></div>
+              <div class="go" id="wd-go" data-s="withdrawAmt">Withdraw ₹1,500</div>
+            </div><img src="assets/dabba/hand-phone-thumb-woman-screen.png" alt=""></div>
+            <div class="tap" id="tap"></div>
+            <div class="slip" id="slip"><b></b><i></i><i></i><span>₹1,500</span></div>
+            <div class="paid" id="paid"><svg width="14" height="14" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+            <div id="glyphs"></div>
+          </div>
+          <p class="frame-title" id="frame-title"></p>
+          <span class="frame-chip" id="frame-chip" data-s="autopay">AutoPay on · Daily</span>
+        </div>
+      </div>
+      <div class="side">
+        <div class="copy bottom" id="copy"><p class="line rise" id="line"></p></div>
+        <div class="cta" id="cta"><a class="btn" href="#start"><span data-t="cta">Start With ₹100</span><span class="arr" aria-hidden="true">→</span></a><p class="risk" data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</p></div>
+      </div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="hint" id="hint" aria-hidden="true"><span data-t="scroll">Scroll</span><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="rail" aria-hidden="true"><span id="rail"></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="moments" aria-labelledby="moments-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label reveal" data-t="mLabel">Maa hai na</span><h2 class="rise" id="moments-h" data-t="mTitle" data-rise>Money ready when it’s needed.</h2><p class="sub reveal" style="--i:3" data-t="mSub">Money she put aside days and months ago, there when the family needs it.</p></div>
+      <div class="fan" id="fan"></div>
+      <div class="picker" id="picker" role="group" aria-label="Moments"><span class="thumb" aria-hidden="true"></span></div>
+    </div>
+  </section>
+
+  <section class="sec white" id="rhythm" aria-labelledby="rhythm-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label reveal" data-t="rLabel">Your rhythm</span><h2 class="rise" id="rhythm-h" data-t="rTitle" data-rise>Save the way you earn.</h2><p class="sub reveal" style="--i:3" data-t="rSub">Daily, weekly or monthly, from ₹100. See what it adds up to.</p></div>
+      <div class="calc" id="calc">
+        <div class="calc-in">
+          <div class="field"><span class="flabel" id="c-how" data-t="cHow">How often</span>
+            <div class="seg" role="group" aria-labelledby="c-how"><span class="thumb" aria-hidden="true"></span>
+              <button type="button" data-f="daily" aria-pressed="true" data-t="daily">Daily</button><button type="button" data-f="weekly" aria-pressed="false" data-t="weekly">Weekly</button><button type="button" data-f="monthly" aria-pressed="false" data-t="monthly">Monthly</button>
+            </div></div>
+          <div class="field"><label class="flabel" for="c-amt"><span data-t="cAmt">Amount each time</span><b id="c-amt-v">₹100</b></label><input type="range" id="c-amt" min="100" max="1000" step="50" value="100"></div>
+          <div class="field"><label class="flabel" for="c-dur"><span data-t="cDur">For how long</span><b id="c-dur-v">1 year</b></label><input type="range" id="c-dur" min="1" max="60" step="1" value="12"></div>
+        </div>
+        <div class="calc-out" aria-live="polite">
+          <span class="mk mk-slot" data-mark="#F97316" data-core="calc-core"></span>
+          <span class="olabel" data-t="cOut">You’ll have put aside</span>
+          <b class="total" id="c-total">₹36,500</b>
+          <span class="osub" id="c-sub">365 payments of ₹100</span>
+          <p class="fine" data-t="cFine">This counts only what you put in. The value of mutual funds can go up or down.</p>
+        </div>
+      </div>
+      <p class="note-line reveal" data-t="rNote">Set it once with your UPI PIN. UPI AutoPay does the rest.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="yours" aria-labelledby="yours-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label reveal" data-t="yLabel">Your money stays yours</span><h2 class="rise" id="yours-h" data-t="yTitle" data-rise>Your money, in your name.</h2><p class="sub reveal" style="--i:3" data-t="ySub">Every rupee is held in your name and comes back to your own bank.</p></div>
+      <div class="trust" id="trust">
+        <div class="tcard"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FFEDD5"/><circle cx="18" cy="14" r="5" fill="#F97316"/><path d="M9 27c1.6-4.4 5-6.5 9-6.5s7.4 2.1 9 6.5" fill="#F97316"/></svg><b data-t="t1">In your name</b><p data-t="t1p">Every rupee you save is held in your own name.</p></div>
+        <div class="tcard"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FFEDD5"/><path d="M9 15l9-6 9 6v1H9z" fill="#F97316"/><rect x="11" y="17" width="3" height="8" fill="#F97316"/><rect x="16.5" y="17" width="3" height="8" fill="#F97316"/><rect x="22" y="17" width="3" height="8" fill="#F97316"/><rect x="9" y="26" width="18" height="2.5" fill="#F97316"/></svg><b data-t="t2">Back to your bank</b><p data-t="t2p">When you take money out, it goes to your own bank account.</p></div>
+        <div class="tcard"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#FFEDD5"/><path d="M11 19v-2a7 7 0 0 1 14 0v2" stroke="#F97316" stroke-width="2.5" fill="none"/><rect x="9" y="18" width="5" height="8" rx="2" fill="#F97316"/><rect x="22" y="18" width="5" height="8" rx="2" fill="#F97316"/></svg><b data-t="t3">Help any time</b><p data-t="t3p">Support is open 24/7.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec white" id="language" aria-labelledby="lang-h">
+    <div class="sec-in">
+      <div class="sec-head"><span class="label reveal" data-t="lLabel">Your language</span><h2 class="rise" id="lang-h" data-t="lTitle" data-rise>In your own language.</h2><p class="sub reveal" style="--i:3" data-t="lSub">Hard words turn simple, in eight languages.</p></div>
+      <div class="marquee" id="marquee"></div>
+    </div>
+  </section>
+
+  <section class="sec start" id="start" aria-labelledby="start-h">
+    <div class="bg" id="start-bg"></div>
+    <div class="sec-in">
+      <span class="mark-big mk-slot" data-mark="#fff"></span>
+      <h2 class="rise" id="start-h" data-t="sTitle" data-rise>Start with ₹100.</h2>
+      <p class="sub" data-t="sSub">Set it once, and it saves on its own.</p>
+      <a class="btn" href="#start"><span data-t="cta">Start With ₹100</span><span class="arr" aria-hidden="true">→</span></a>
+      <p class="risk" data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a class="logo" href="#top"><span class="mk-slot" data-mark="#F97316"></span>Rupyon</a>
+  <p><span data-t="support">Support 24/7</span> · <span data-t="risk">Mutual fund investments are subject to market risks. Read all scheme related documents carefully.</span></p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+const ART = "assets/dabba/";
+/* the Turn mark from brand/turn-mark.svg, drawn inline so its eight petals and its centre can move on their own */
+const PETALS = ["M89.6 50L79.4 60.2L79.4 39.8Z", "M78 78L63.58 78L78 63.58Z", "M50 89.6L39.8 79.4L60.2 79.4Z", "M22 78L22 63.58L36.42 78Z", "M10.4 50L20.6 39.8L20.6 60.2Z", "M22 22L36.42 22L22 36.42Z", "M50 10.4L60.2 20.6L39.8 20.6Z", "M78 22L78 36.42L63.58 22Z"];
+const CORE = "M62.93 55.36L54.95 54.95L55.36 62.93L50 57L44.64 62.93L45.05 54.95L37.07 55.36L43 50L37.07 44.64L45.05 45.05L44.64 37.07L50 43L55.36 37.07L54.95 45.05L62.93 44.64L57 50Z";
+document.querySelectorAll(".mk-slot").forEach(el => {
+  const f = el.dataset.mark, id = el.dataset.core ? ` id="${el.dataset.core}"` : "";
+  el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true">${PETALS.map(d => `<path class="petal" fill="${f}" d="${d}"/>`).join("")}<g class="core"${id}><path fill="${f}" d="${CORE}"/></g></svg>`;
+});
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+gsap.registerPlugin(ScrollTrigger);
+
+/* ---------- words, in English and Hindi. The Hindi is a draft for native review ---------- */
+const RISK = { en: "Mutual fund investments are subject to market risks. Read all scheme related documents carefully.", hi: "म्यूचुअल फंड निवेश बाज़ार जोखिमों के अधीन हैं। योजना से जुड़े सभी दस्तावेज़ ध्यान से पढ़ें।" };
+const STR = {
+  en: { cta: "Start With ₹100", risk: RISK.en, support: "Support 24/7", scroll: "Scroll",
+    mLabel: "Maa hai na", mTitle: "Money ready when it’s needed.", mSub: "Money she put aside days and months ago, there when the family needs it.",
+    rLabel: "Your rhythm", rTitle: "Save the way you earn.", rSub: "Daily, weekly or monthly, from ₹100. See what it adds up to.", daily: "Daily", weekly: "Weekly", monthly: "Monthly", cHow: "How often", cAmt: "Amount each time", cDur: "For how long", cOut: "You’ll have put aside", cFine: "This counts only what you put in. The value of mutual funds can go up or down.", rNote: "Set it once with your UPI PIN. UPI AutoPay does the rest.",
+    yLabel: "Your money stays yours", yTitle: "Your money, in your name.", ySub: "Every rupee is held in your name and comes back to your own bank.",
+    t1: "In your name", t1p: "Every rupee you save is held in your own name.", t2: "Back to your bank", t2p: "When you take money out, it goes to your own bank account.", t3: "Help any time", t3p: "Support is open 24/7.",
+    lLabel: "Your language", lTitle: "In your own language.", lSub: "Hard words turn simple, in eight languages.",
+    sTitle: "Start with ₹100.", sSub: "Set it once, and it saves on its own." },
+  hi: { cta: "₹100 से शुरू करें", risk: RISK.hi, support: "सहायता 24/7", scroll: "स्क्रॉल करें",
+    mLabel: "माँ है ना", mTitle: "जब ज़रूरत हो, पैसा तैयार।", mSub: "दिनों और महीनों पहले बचाया पैसा, परिवार की ज़रूरत पर हाज़िर।",
+    rLabel: "आपकी रफ़्तार", rTitle: "जैसी कमाई, वैसी बचत।", rSub: "रोज़, हर हफ़्ते या हर महीने, ₹100 से। देखिए कितना जुड़ता है।", daily: "रोज़", weekly: "हर हफ़्ते", monthly: "हर महीने", cHow: "कितनी बार", cAmt: "हर बार कितना", cDur: "कितने समय तक", cOut: "आपकी कुल जमा", cFine: "यह सिर्फ़ आपकी जमा की गई रकम है। म्यूचुअल फंड की वैल्यू घट-बढ़ सकती है।", rNote: "एक बार UPI PIN से सेट करें। बाकी UPI AutoPay कर देगा।",
+    yLabel: "पैसा आपका ही रहता है", yTitle: "पैसा आपका, आपके नाम।", ySub: "हर रुपया आपके नाम पर, और वापस आपके अपने बैंक में।",
+    t1: "आपके नाम पर", t1p: "आपकी बचत का हर रुपया आपके अपने नाम पर रहता है।", t2: "बैंक में वापस", t2p: "पैसे निकालने पर वे सीधे आपके अपने बैंक खाते में जाते हैं।", t3: "हर समय मदद", t3p: "सहायता 24/7 उपलब्ध है।",
+    lLabel: "आपकी भाषा", lTitle: "अपनी भाषा में।", lSub: "मुश्किल शब्द आसान, आठ भाषाओं में।",
+    sTitle: "₹100 से शुरू करें।", sSub: "एक बार सेट करें, बचत अपने आप होगी।" },
+};
+/* words inside the scene */
+const SCENE = {
+  en: { day: "DAY", autopay: "AutoPay on · Daily", withdraw: "Withdraw", withdrawAmt: "Withdraw ₹1,500", onWay: "On its way to your bank",
+    phoneTitle: "Mum’s tin, on her phone", cardTitle: "Your money, when you need it",
+    orbit: ["Daily", "UPI AutoPay", "From ₹100", "In your name", "Weekly", "8 languages", "Back to your bank", "Monthly", "24/7 help"] },
+  hi: { day: "दिन", autopay: "AutoPay चालू · रोज़", withdraw: "पैसे निकालें", withdrawAmt: "₹1,500 निकालें", onWay: "आपके बैंक में आ रहा है",
+    phoneTitle: "मम्मी का डब्बा, फ़ोन में", cardTitle: "आपका पैसा, जब ज़रूरत हो",
+    orbit: ["रोज़", "UPI AutoPay", "₹100 से", "आपके नाम पर", "हर हफ़्ते", "8 भाषाएँ", "बैंक में वापस", "हर महीने", "24/7 मदद"] },
+};
+/* the seven beats, as in site.html; w is each beat's share of the scroll */
+const BEATS = [
+  { w: 1.3, pos: "bottom", line: { en: "Save from ₹100, on its own.", hi: "₹100 से बचत, अपने आप।" } },
+  { w: 2, pos: "top", line: { en: "A little every day adds up.", hi: "रोज़ थोड़ा-थोड़ा, जुड़ता जाता है।" } },
+  { w: 2, pos: "top", line: { en: "Mum’s tin. Now on her phone too.", hi: "मम्मी का डब्बा, अब फ़ोन में भी।" } },
+  { w: 2.2, pos: "top", line: { en: "It saves on its own, every day.", hi: "हर दिन, अपने आप बचत।" } },
+  { w: 1.7, pos: "top", line: { en: "Fees due on Friday.", hi: "शुक्रवार तक फ़ीस भरनी है।" } },
+  { w: 2.6, pos: "top", line: { en: "Saved months ago. There when it’s needed.", hi: "महीनों पहले बचाया, ज़रूरत पर काम आया।" } },
+  { w: 2.2, pos: "top", line: { en: "Maa’s got it.", hi: "माँ है ना।" }, cta: true },
+];
+const MOMENTS = [
+  { who: "maa", amt: "₹1,500", art: "need-school-bag", en: "Fees due? Maa’s got it.", hi: "फ़ीस भरनी है? माँ है ना।", saved: { en: "Saved ₹100 a day since July", hi: "जुलाई से ₹100 रोज़ बचाए" } },
+  { who: "maa", amt: "₹900", art: "need-gas-cylinder", en: "Out of gas? Maa’s got it.", hi: "गैस ख़त्म? माँ है ना।", saved: { en: "Saved ₹200 a week since August", hi: "अगस्त से ₹200 हर हफ़्ते बचाए" } },
+  { who: "bahu", amt: "₹650", art: "need-medicine", en: "Papa ji’s medicines? Bahu’s got it.", hi: "पापा जी की दवाई? बहू है ना।", saved: { en: "Saved ₹500 a month since June", hi: "जून से ₹500 हर महीने बचाए" } },
+  { who: "maa", amt: "₹2,400", art: "need-festive-clothes", en: "New clothes for Diwali? Maa’s got it.", hi: "दिवाली के नए कपड़े? माँ है ना।", saved: { en: "Saved ₹100 a day since Raksha Bandhan", hi: "रक्षाबंधन से ₹100 रोज़ बचाए" } },
+  { who: "maa", amt: "₹4,800", art: "need-bicycle", en: "A cycle for school? Maa’s got it.", hi: "स्कूल की साइकिल? माँ है ना।", saved: { en: "Saved ₹1,000 a month since April", hi: "अप्रैल से ₹1,000 हर महीने बचाए" } },
+  { who: "self", amt: "₹6,500", art: "need-sewing-machine", en: "A sewing machine. For herself too.", hi: "सिलाई मशीन। अपने लिए भी।", saved: { en: "Saved ₹1,000 a month since January", hi: "जनवरी से ₹1,000 हर महीने बचाए" } },
+];
+const WHO = { en: { maa: "Maa", bahu: "Bahu", self: "Herself" }, hi: { maa: "माँ", bahu: "बहू", self: "अपने लिए" } };
+const PICK = { en: ["Fees", "Gas", "Medicine", "Diwali", "Cycle", "Herself"], hi: ["फ़ीस", "गैस", "दवाई", "दिवाली", "साइकिल", "अपने लिए"] };
+let lang = "en";
+try { if (localStorage.getItem("rupyon-lang") === "hi") lang = "hi"; } catch (e) {}
+
+/* words that rise: each word in its own mask, delayed one after another */
+function riseText(el, text) {
+  el.innerHTML = text.split(" ").map((w, i) => `<span class="w"><span style="--i:${i}">${w}</span></span>`).join(" ");
+}
+
+/* ---------- the scene's fixed parts ---------- */
+function homeScreen(el) {
+  el.innerHTML = `<div class="hd">Rupyon<b>₹100</b></div><div class="mini"><img class="body" src="${ART}dabba-tin-body.png" alt=""><img class="lid" src="${ART}dabba-tin-lid-orange.png" alt=""></div><div class="chip">${SCENE[lang].autopay}</div>`;
+}
+const NOTE_X = [-22, -6, 10, 24], NOTE_R = [-10, -3, 4, 11];
+$("notes").innerHTML = NOTE_X.map((x, i) => `<img src="${ART}dabba-note-rolled.png" alt="" style="transform:translate(${x}px,-40px) rotate(${NOTE_R[i]}deg)">`).join("");
+const NEEDS = [["need-school-bag", 52, 210], ["need-gas-cylinder", 300, 200], ["need-medicine", 34, 360], ["need-festive-clothes", 318, 350], ["need-bicycle", 70, 500], ["need-sewing-machine", 292, 500]];
+$("needs").innerHTML = NEEDS.map(([n, x, y]) => `<div class="need" style="left:${x - 32}px;top:${y - 32}px"><img src="${ART}${n}.png" alt=""></div>`).join("");
+const GLYPHS = [["अ", 70, 200], ["ক", 292, 214], ["ગ", 50, 330], ["த", 310, 350], ["తె", 76, 460], ["ಕ", 288, 476], ["म", 180, 150]];
+$("glyphs").innerHTML = GLYPHS.map(([g, x, y]) => `<div class="glyph" style="left:${x}px;top:${y}px">${g}</div>`).join("");
+$("burst-svg").innerHTML = Array.from({ length: 20 }, (_, i) => { const a = i / 20 * Math.PI * 2, r1 = 70, r2 = i % 2 ? 150 : 190;
+  return `<line x1="${210 + Math.cos(a) * r1}" y1="${210 + Math.sin(a) * r1}" x2="${210 + Math.cos(a) * r2}" y2="${210 + Math.sin(a) * r2}" stroke="${i % 2 ? "#FED7AA" : "#F97316"}" stroke-width="${i % 2 ? 6 : 8}" stroke-linecap="round"/>`; }).join("");
+
+/* the 360 x 640 world, scaled to fit its frame */
+const frame = $("frame"), fit = $("fit");
+function fitScene() { const s = Math.min(frame.clientWidth / 360, frame.clientHeight / 640); fit.style.transform = `scale(${s}) translate(-50%, -50%)`; }
+new ResizeObserver(fitScene).observe(frame);
+
+/* ---------- the opener: one timeline, scrubbed by the scroll ---------- */
+const SUM = BEATS.reduce((a, b) => a + b.w, 0);
+const EDGE = BEATS.reduce((acc, b) => (acc.push(acc[acc.length - 1] + b.w), acc), [0]);
+const at = (i, f) => EDGE[i] + BEATS[i].w * f; // a moment in beat i, f from 0 to 1
+const span = (i, a, b) => BEATS[i].w * (b - a);
+const io = "power3.inOut", out = "power3.out"; // the in-out for moving on screen, the out for arriving
+gsap.set("#world", { transformOrigin: "50% 50%" });
+gsap.set(["#tin", "#pill", "#shadow"], { y: 0 });
+const tl = gsap.timeline({ paused: true, defaults: { ease: io } });
+const count = { n: 1 };
+const flood = (id, x, y) => gsap.fromTo(id, { clipPath: `circle(0% at ${x}% ${y}%)` }, { clipPath: `circle(150% at ${x}% ${y}%)`, ease: io, immediateRender: false });
+
+/* 1 the mark, inside its orbit of words; the pulses start */
+tl.to("#pulse", { opacity: .7, duration: span(0, .3, .8) }, at(0, .3))
+/* 2 the mark steps back; a pill arrives and the tin rises onto it; the pill rounds into a circle; notes drop in; days count up */
+  .to("#mark", { scale: .4, x: 112, y: -175, opacity: 0, duration: span(1, 0, .3) }, at(1, 0))
+  .to("#orbit", { scale: 1.15, opacity: 0, duration: span(1, 0, .25) }, at(1, 0))
+  .to("#pulse", { opacity: 0, duration: span(1, 0, .15) }, at(1, 0))
+  .fromTo("#pill", { opacity: 0, scale: .94 }, { opacity: 1, scale: 1, ease: out, duration: span(1, .08, .3) }, at(1, .08))
+  .fromTo("#tin", { opacity: 0, y: 60 }, { opacity: 1, y: 0, ease: out, duration: span(1, .16, .38) }, at(1, .16))
+  .fromTo("#shadow", { opacity: 0, scaleX: .6 }, { opacity: 1, scaleX: 1, ease: out, duration: span(1, .2, .38) }, at(1, .2))
+  .to("#pill", { clipPath: "inset(0px 0px round 145px)", duration: span(1, .3, .52) }, at(1, .3))
+  .to("#lid", { y: -38, x: -50, rotation: -14, duration: span(1, .36, .5) }, at(1, .36))
+  .fromTo("#day", { opacity: 0, y: -10, scale: .96 }, { opacity: 1, y: 0, scale: 1, ease: out, duration: span(1, .3, .42) }, at(1, .3))
+  .to(count, { n: 90, ease: "power2.in", duration: span(1, .45, .95), onUpdate: () => { $("day-n").textContent = Math.round(count.n); } }, at(1, .45))
+  .to("#pulse", { opacity: .55, y: 30, duration: span(1, .5, .6) }, at(1, .5));
+[...$("notes").children].forEach((n, i) => tl.to(n, { y: 330, ease: "power2.in", duration: span(1, 0, .14) }, at(1, .5 + i * .1)));
+/* 3 the lid closes and turns orange; peach floods in; her phone rises and the tin goes into it; the scene pulls back into a card */
+tl.to("#lid", { y: 0, x: 0, rotation: 0, duration: span(2, 0, .12) }, at(2, 0))
+  .to("#lid-orange", { opacity: 1, duration: span(2, .06, .16) }, at(2, .06))
+  .to("#pulse", { opacity: 0, duration: span(2, 0, .1) }, at(2, 0))
+  .add(flood("#flood-peach", 50, 52).duration(span(2, .1, .4)), at(2, .1))
+  .to(["#pill", "#shadow", "#day"], { opacity: 0, duration: span(2, .12, .3) }, at(2, .12))
+  .fromTo("#phone", { opacity: 1, y: 520 }, { opacity: 1, y: 0, ease: out, duration: span(2, .16, .5), immediateRender: false }, at(2, .16))
+  .to("#tin", { x: 0, y: -18, scale: .37, duration: span(2, .3, .56) }, at(2, .3))
+  .to("#tin", { opacity: 0, duration: span(2, .56, .62) }, at(2, .56))
+  .fromTo("#phone-scr", { opacity: 0 }, { opacity: 1, duration: span(2, .5, .62) }, at(2, .5))
+  .to("#world", { scale: .8, clipPath: "inset(0% round 30px)", duration: span(2, .72, .96) }, at(2, .72))
+  .fromTo("#frame-title", { opacity: 0, y: 8 }, { opacity: 1, y: 0, ease: out, duration: span(2, .8, .96) }, at(2, .8))
+  .fromTo("#frame-chip", { opacity: 0, y: 8 }, { opacity: 1, y: 0, ease: out, duration: span(2, .84, .98) }, at(2, .84))
+/* 4 the card opens back out as her hand brings the phone up; it pulses, saving on its own */
+  .to("#world", { scale: 1, clipPath: "inset(0% round 0px)", duration: span(3, 0, .22) }, at(3, 0))
+  .to(["#frame-title", "#frame-chip"], { opacity: 0, duration: span(3, 0, .1) }, at(3, 0))
+  .to("#phone", { opacity: 0, y: -30, duration: span(3, .1, .3) }, at(3, .1))
+  .fromTo("#hand1", { opacity: 1, y: 560 }, { opacity: 1, y: 0, ease: out, duration: span(3, .05, .4), immediateRender: false }, at(3, .05))
+  .to("#pulse", { y: 0, opacity: .7, duration: span(3, .35, .5) }, at(3, .35))
+  .to("#hand1", { scale: 1.04, transformOrigin: "50% 40%", duration: span(3, .5, 1) }, at(3, .5))
+/* 5 white floods up from her hand; the fee slip arrives with her daughter; the family's needs pop in round her */
+  .add(flood("#flood-white", 50, 100).duration(span(4, 0, .32)), at(4, 0))
+  .to("#hand1", { y: 600, duration: span(4, 0, .3) }, at(4, 0))
+  .to("#pulse", { opacity: 0, duration: span(4, 0, .1) }, at(4, 0))
+  .fromTo("#girl", { opacity: 0, y: 70, scale: .96 }, { opacity: 1, y: 0, scale: 1, ease: out, duration: span(4, .16, .46) }, at(4, .16));
+gsap.utils.toArray("#needs .need").forEach((n, i) => tl.fromTo(n, { opacity: 0, scale: .9, x: (180 - parseFloat(n.style.left) - 32) * .35, y: (330 - parseFloat(n.style.top) - 32) * .35 },
+  { opacity: 1, scale: 1, x: 0, y: 0, ease: out, duration: span(4, 0, .22) }, at(4, .4 + i * .08)));
+/* 6 she takes it out: her thumb on Withdraw, a tap, the tin opens, a burst, the slip is paid; the scene pulls back into a card */
+tl.to("#girl", { opacity: 0, y: 40, duration: span(5, 0, .12) }, at(5, 0))
+  .to("#needs .need", { opacity: 0, scale: .92, duration: span(5, 0, .1) }, at(5, 0))
+  .fromTo("#hand2", { opacity: 1, y: 600 }, { opacity: 1, y: 0, ease: out, duration: span(5, .04, .28), immediateRender: false }, at(5, .04))
+  .fromTo("#tap", { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, ease: out, duration: span(5, .3, .35) }, at(5, .3))
+  .to("#tap", { opacity: 0, scale: 1.5, ease: out, duration: span(5, .35, .42) }, at(5, .35))
+  .to("#wd-go", { scale: .96, duration: span(5, .3, .34) }, at(5, .3))
+  .to("#wd-go", { scale: 1, opacity: 0, duration: span(5, .36, .44) }, at(5, .36))
+  .to("#wd-lid", { y: -26, x: -14, rotation: -12, duration: span(5, .34, .46) }, at(5, .34))
+  .fromTo("#wd-done", { opacity: 0, y: 8 }, { opacity: 1, y: 0, ease: out, duration: span(5, .42, .5) }, at(5, .42))
+  .fromTo("#burst", { opacity: 0, scale: .55, rotation: -10 }, { opacity: 1, scale: 1, rotation: 0, ease: out, duration: span(5, .44, .58) }, at(5, .44))
+  .to("#burst", { opacity: 0, scale: 1.12, duration: span(5, .58, .7) }, at(5, .58))
+  .fromTo("#slip", { opacity: 0, x: 40, y: -20, rotation: 12 }, { opacity: 1, x: 0, y: 0, rotation: 4, ease: out, duration: span(5, .46, .6) }, at(5, .46))
+  .fromTo("#paid", { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, ease: "back.out(2)", duration: span(5, .58, .64) }, at(5, .58))
+  .to("#world", { scale: .8, clipPath: "inset(0% round 30px)", duration: span(5, .74, .96) }, at(5, .74))
+  .fromTo("#frame-title", { opacity: 0, y: 8 }, { opacity: 1, y: 0, ease: out, duration: span(5, .8, .96), immediateRender: false }, at(5, .8))
+/* 7 back out to the cream; the mark returns, every language round it, and the orbit turns again */
+  .to("#world", { scale: 1, clipPath: "inset(0% round 0px)", duration: span(6, 0, .22) }, at(6, 0))
+  .to("#frame-title", { opacity: 0, duration: span(6, 0, .1) }, at(6, 0))
+  .to(["#hand2", "#slip", "#paid"], { y: "+=40", opacity: 0, duration: span(6, 0, .2) }, at(6, 0))
+  .add(flood("#flood-cream", 50, 45).duration(span(6, .05, .35)), at(6, .05))
+  .fromTo("#mark", { opacity: 0, scale: .5, x: 0, y: -10 }, { opacity: 1, scale: 1.1, x: 0, y: -10, ease: out, duration: span(6, .2, .45), immediateRender: false }, at(6, .2))
+  .fromTo("#orbit", { opacity: 0, scale: .9, y: -10 }, { opacity: 1, scale: 1, y: -10, ease: out, duration: span(6, .3, .55), immediateRender: false }, at(6, .3));
+gsap.utils.toArray("#glyphs .glyph").forEach((g, i) => tl.fromTo(g, { opacity: 0, scale: .9 }, { opacity: 1, scale: 1, ease: out, duration: span(6, 0, .15) }, at(6, .4 + i * .05)));
+tl.to({}, { duration: .001 }, SUM); // the timeline's length is the whole opener
+
+/* copy, dots and the CTA follow the beat the scroll is in */
+const lineEl = $("line"), copy = $("copy"), ctaEl = $("cta"), dots = $("dots");
+dots.innerHTML = BEATS.map(() => "<i></i>").join("");
+let cur = -1;
+function setBeat(i, force) {
+  if (i === cur && !force) return;
+  cur = i; const b = BEATS[i];
+  copy.className = "copy " + b.pos; lineEl.classList.remove("show");
+  riseText(lineEl, b.line[lang]); void lineEl.offsetWidth; lineEl.classList.add("show");
+  [...dots.children].forEach((d, k) => d.classList.toggle("on", k === i));
+  $("frame-title").textContent = i <= 3 ? SCENE[lang].phoneTitle : SCENE[lang].cardTitle;
+}
+ScrollTrigger.create({
+  trigger: "#opener", start: "top top", end: "bottom bottom", scrub: reduce ? true : 0.6, animation: tl,
+  onUpdate: self => {
+    const t = self.progress * SUM; let i = 0; while (i < BEATS.length - 1 && t >= EDGE[i + 1]) i++;
+    setBeat(i);
+    ctaEl.classList.toggle("show", !!BEATS[i].cta && t > at(i, .3));
+    gsap.set("#rail", { scaleX: self.progress });
+    $("hint").style.opacity = self.progress > .015 ? 0 : 1;
+  },
+});
+
+/* the first thing on load, before any scroll: the mark arrives big and settles into its orbit */
+gsap.timeline({ defaults: { ease: out } })
+  .fromTo("#mark", { scale: 2.6, rotation: -45 }, { scale: 1, rotation: 0, duration: reduce ? 0 : 1.2 })
+  .fromTo("#orbit", { opacity: 0, scale: .9 }, { opacity: 1, scale: 1, duration: reduce ? 0 : .9 }, reduce ? 0 : .5);
+
+/* ---------- moments: a fan that opens when it arrives and shuffles every few seconds ---------- */
+const fan = $("fan"), picker = $("picker");
+let active = 0, auto;
+function renderMoments() {
+  fan.innerHTML = MOMENTS.map((m, i) => `<article class="moment" tabindex="0" data-i="${i}"><div class="art"><img src="${ART}${m.art}.png" alt="" loading="lazy" width="512" height="512"></div>
+    <div class="mtop"><span class="who ${m.who === "maa" ? "" : m.who}">${WHO[lang][m.who]}</span><span class="amt">${m.amt}</span></div>
+    <p class="mline">${m[lang]}</p><p class="saved">${m.saved[lang]}</p></article>`).join("");
+  picker.innerHTML = `<span class="thumb" aria-hidden="true"></span>` + PICK[lang].map((p, i) => `<button type="button" data-i="${i}" aria-label="${p}"><span>${p}</span></button>`).join("");
+  picker.style.setProperty("--n", MOMENTS.length);
+  fan.querySelectorAll(".moment").forEach(c => { c.addEventListener("click", () => pick(+c.dataset.i)); c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(+c.dataset.i); } }); });
+  picker.querySelectorAll("button").forEach(b => b.addEventListener("click", () => pick(+b.dataset.i)));
+  layoutFan();
+}
+function layoutFan() {
+  fan.querySelectorAll(".moment").forEach((c, i) => {
+    let k = i - active; const n = MOMENTS.length; if (k > n / 2) k -= n; if (k < -n / 2) k += n;
+    c.style.setProperty("--k", k); c.style.setProperty("--ak", Math.abs(k)); c.style.zIndex = 10 - Math.abs(k);
+    c.setAttribute("aria-current", String(k === 0));
+  });
+  picker.style.setProperty("--at", active);
+  picker.querySelectorAll("button").forEach((b, i) => b.setAttribute("aria-pressed", String(i === active)));
+}
+function pick(i) { active = i; layoutFan(); restart(); }
+function restart() { clearInterval(auto); if (!reduce && fan.classList.contains("open")) auto = setInterval(() => { active = (active + 1) % MOMENTS.length; layoutFan(); }, 3200); }
+fan.addEventListener("pointerenter", () => clearInterval(auto));
+fan.addEventListener("pointerleave", restart);
+ScrollTrigger.create({ trigger: fan, start: "top 75%", onEnter: () => { fan.classList.add("open"); restart(); }, onLeaveBack: () => { fan.classList.remove("open"); clearInterval(auto); } });
+
+/* ---------- reveals: headings rise word by word, the rest fades up, trust cards grow into place as Kiwi's media does ---------- */
+const seen = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add(e.target.matches("[data-rise]") ? "show" : "in"); seen.unobserve(e.target); } }), { rootMargin: "0px 0px -12% 0px" });
+document.querySelectorAll(".reveal, [data-rise]").forEach(el => seen.observe(el));
+if (!reduce) {
+  gsap.utils.toArray(".tcard").forEach((c, i) => gsap.fromTo(c, { scale: .86, opacity: 0, y: 30 }, { scale: 1, opacity: 1, y: 0, ease: "none", scrollTrigger: { trigger: "#trust", start: `top ${92 - i * 4}%`, end: `top ${58 - i * 4}%`, scrub: .5 } }));
+  gsap.fromTo("#calc", { scale: .92 }, { scale: 1, ease: "none", scrollTrigger: { trigger: "#calc", start: "top 95%", end: "top 55%", scrub: .5 } });
+}
+gsap.fromTo("#start-bg", { clipPath: "circle(8% at 50% 60%)" }, { clipPath: "circle(120% at 50% 60%)", ease: "none", scrollTrigger: { trigger: "#start", start: "top 85%", end: "top 25%", scrub: reduce ? true : .5 } });
+
+/* ---------- languages marquee ---------- */
+const LANGS = [["hi", "हिन्दी"], ["mr", "मराठी"], ["bn", "বাংলা"], ["gu", "ગુજરાતી"], ["ta", "தமிழ்"], ["te", "తెలుగు"], ["kn", "ಕನ್ನಡ"], ["en", "English"]];
+const row = (list, rev) => `<div class="track${rev ? " rev" : ""}">` + [0, 1].map(d => list.map(([l, t], i) => `<span class="lang${(i + (rev ? 1 : 0)) % 3 === 0 ? " o" : ""}${d ? " dup" : ""}" lang="${l}"${d ? ' aria-hidden="true"' : ""}>${t}</span>`).join("")).join("") + `</div>`;
+$("marquee").innerHTML = row(LANGS) + row([...LANGS].reverse(), true);
+
+/* ---------- savings calculator: only what she puts in, never returns. The total rolls to its new value ---------- */
+const RANGE = { daily: [100, 1000, 50], weekly: [100, 5000, 100], monthly: [100, 20000, 100] };
+const amt = $("c-amt"), dur = $("c-dur"), segs = document.querySelectorAll(".seg button");
+let freq = "daily", shown = 36500, turns = 0;
+const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
+const roll = { v: shown };
+function durText(m) {
+  const y = Math.floor(m / 12), r = m % 12, o = [];
+  if (lang === "hi") { if (y) o.push(`${y} साल`); if (r) o.push(`${r} ${r === 1 ? "महीना" : "महीने"}`); }
+  else { if (y) o.push(`${y} ${y === 1 ? "year" : "years"}`); if (r) o.push(`${r} ${r === 1 ? "month" : "months"}`); }
+  return o.join(" ");
+}
+function updateCalc(animate = true) {
+  const [mn, mx, st] = RANGE[freq]; amt.min = mn; amt.max = mx; amt.step = st;
+  const a = +amt.value, m = +dur.value, n = freq === "daily" ? Math.round(m * 365 / 12) : freq === "weekly" ? Math.round(m * 52 / 12) : m, total = n * a;
+  $("c-amt-v").textContent = inr(a); $("c-dur-v").textContent = durText(m);
+  $("c-sub").textContent = lang === "hi" ? `${inr(a)} की ${n.toLocaleString("en-IN")} ${n === 1 ? "किस्त" : "किस्तें"}` : `${n.toLocaleString("en-IN")} ${n === 1 ? "payment" : "payments"} of ${inr(a)}`;
+  gsap.killTweensOf(roll); // retarget from wherever it is now
+  gsap.to(roll, { v: total, duration: animate && !reduce ? .35 : 0, ease: "power3.out", onUpdate: () => { $("c-total").textContent = inr(roll.v); } });
+  if (total !== shown && !reduce) { turns += total > shown ? 1 : -1; $("calc-core").style.transform = `rotate(${turns * 45}deg)`; }
+  shown = total;
+}
+segs.forEach((b, i) => b.addEventListener("click", () => { freq = b.dataset.f; segs.forEach(x => x.setAttribute("aria-pressed", String(x === b))); b.parentElement.style.setProperty("--at", i); updateCalc(); }));
+amt.addEventListener("input", () => updateCalc()); dur.addEventListener("input", () => updateCalc());
+
+/* ---------- language switch: English first, remembered on this device ---------- */
+const toggle = document.querySelector(".lang-toggle"), toggles = toggle.querySelectorAll("button");
+function applyLang(l) {
+  lang = l; document.documentElement.lang = l; toggle.dataset.on = l;
+  document.querySelectorAll("[data-t]").forEach(el => { const t = STR[l][el.dataset.t]; if (el.matches("[data-rise]")) { riseText(el, t); } else el.textContent = t; });
+  document.querySelectorAll("[data-s]").forEach(el => { el.textContent = SCENE[l][el.dataset.s]; });
+  $("orbit-text").textContent = SCENE[l].orbit.join("  ·  ") + "  ·";
+  homeScreen($("phone-scr")); homeScreen($("hand1-scr"));
+  toggles.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
+  renderMoments(); updateCalc(false); setBeat(Math.max(cur, 0), true);
+  try { localStorage.setItem("rupyon-lang", l); } catch (e) {}
+}
+toggles.forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
+/* rising headings already on screen stay shown after a language switch */
+const keepShown = () => document.querySelectorAll("[data-rise]").forEach(el => { if (el.getBoundingClientRect().top < innerHeight) el.classList.add("show"); });
+
+/* ---------- smooth scroll, as Kiwi's site has, kept in step with the scroll triggers ---------- */
+let lenis = null;
+if (!reduce && window.Lenis) {
+  lenis = new Lenis({ lerp: 0.1 });
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener("click", e => {
+  const t = document.querySelector(a.getAttribute("href")); if (!t) return; e.preventDefault();
+  lenis ? lenis.scrollTo(t, { duration: 1.4 }) : t.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+}));
+
+/* #beat-1 to #beat-7 jump to that beat, for review and screenshots */
+function jump() {
+  const m = location.hash.match(/^#beat-([1-7])$/); if (!m) return;
+  const k = +m[1] - 1, f = (at(k, k === 5 ? .62 : .8)) / SUM, op = $("opener");
+  const y = op.offsetTop + f * (op.offsetHeight - innerHeight);
+  lenis ? lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+}
+addEventListener("hashchange", jump);
+
+/* the presenting harness (index.html) drives language and jumps from outside the frame */
+addEventListener("message", e => {
+  const m = e.data && e.data.rupyon; if (!m) return;
+  if (m.lang && STR[m.lang]) { applyLang(m.lang); keepShown(); }
+  if (m.hash) { if (location.hash === m.hash) jump(); else location.hash = m.hash; }
+});
+if (parent !== window) parent.postMessage({ rupyonReady: true }, "*");
+
+[ART + "dabba-tin-body.png", ART + "dabba-tin-lid-orange.png", ART + "hand-phone-hold-woman-screen.png", ART + "hand-phone-thumb-woman-screen.png", ART + "dabba-daughter-slip.png"].forEach(s => { new Image().src = s; });
+applyLang(lang);
+jump();
+</script>
+</body>
+</html>

@@ -50,6 +50,7 @@ body.bare #pf { width: 100%; height: 100%; }
 <div class="bar">
   <h1>Rupyon · Maa hai na</h1>
   <div class="seg" role="group" aria-label="View"><button type="button" data-view="phone" aria-pressed="false">Phone</button><button type="button" data-view="desktop" aria-pressed="false">Desktop</button><button type="button" data-view="both" aria-pressed="false">Both</button></div>
+  <div class="seg" role="group" aria-label="Variation"><button type="button" data-site="site.html" aria-pressed="false">Original</button><button type="button" data-site="kiwi.html" aria-pressed="false">Kiwi beats</button></div>
   <div class="seg" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="hi" lang="hi" aria-pressed="false">हिंदी</button></div>
   <label class="jump">Jump to
     <select id="jump">
@@ -64,13 +65,13 @@ body.bare #pf { width: 100%; height: 100%; }
   <div class="slot" id="desk-slot"><span class="label">Desktop · 1440 × 900</span><div class="scale"><div class="desk"><div class="chrome"><i></i><i></i><i></i></div><iframe id="df" title="Desktop view"></iframe></div></div></div>
 </div>
 <script>
-const SITE = "site.html";
+let SITE = "site.html";
 const PHONE = [410, 864], DESK = [1440, 928], GAP = 32;
 const pf = document.getElementById("pf"), df = document.getElementById("df"), stage = document.getElementById("stage");
 const slots = { phone: document.getElementById("phone-slot"), desktop: document.getElementById("desk-slot") };
 const ready = new Set();
 let view = "desktop", lang = "en", hash = "";
-try { view = localStorage.getItem("rupyon-view") || (innerWidth < 1100 ? "phone" : "desktop"); lang = localStorage.getItem("rupyon-lang") || "en"; } catch (e) {}
+try { view = localStorage.getItem("rupyon-view") || (innerWidth < 1100 ? "phone" : "desktop"); lang = localStorage.getItem("rupyon-lang") || "en"; SITE = localStorage.getItem("rupyon-site") || SITE; } catch (e) {}
 
 const send = (f, msg) => { if (ready.has(f)) f.contentWindow.postMessage({ rupyon: msg }, "*"); };
 addEventListener("message", e => {
@@ -79,7 +80,8 @@ addEventListener("message", e => {
   ready.add(f); send(f, { lang }); if (hash) send(f, { hash });
 });
 function load(f) {
-  if (f.src) return;
+  if (f.dataset.site === SITE) return;
+  ready.delete(f); f.dataset.site = SITE; f.parentElement.querySelector(".oops")?.remove();
   f.src = SITE + (location.hash || "");
   /* if the site never says hello, the host blocked the frame: offer the page itself */
   setTimeout(() => { if (!ready.has(f)) f.parentElement.insertAdjacentHTML("beforeend", `<div class="oops"><p>The preview couldn’t load here.<br><a href="${SITE}" target="_blank" rel="noopener">Open the site on its own</a></p></div>`); }, 8000);
@@ -108,6 +110,13 @@ document.querySelectorAll("[data-lang]").forEach(b => b.addEventListener("click"
   [pf, df].forEach(f => send(f, { lang }));
 }));
 document.querySelectorAll("[data-lang]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.lang === lang)));
+/* the two variations: the original scroll story, and the one that moves to Kiwi's beats */
+function markSite() { document.querySelectorAll("button[data-site]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.site === SITE))); }
+document.querySelectorAll("button[data-site]").forEach(b => b.addEventListener("click", () => {
+  SITE = b.dataset.site; try { localStorage.setItem("rupyon-site", SITE); } catch (e) {}
+  markSite(); [pf, df].forEach(f => { if (f.dataset.site) load(f); });
+}));
+markSite();
 const jumpSel = document.getElementById("jump");
 if (location.hash && jumpSel.querySelector(`option[value="${location.hash}"]`)) jumpSel.value = location.hash;
 jumpSel.addEventListener("change", e => { hash = e.target.value; [pf, df].forEach(f => send(f, { hash })); });
